@@ -1,0 +1,26 @@
+\documentclass[10pt, DIV=14]{scrartcl}
+% Korrektur Binden
+% \KOMAoptions{BCOR=0mm}
+\usepackage{documentation}
+\begin{document}
+    \pagestyle{scrheadings}
+    \chead{Nicolas Meisberger und Jan Friebertshäuser: Grundlagen der Computergrafik Curveball}
+    \cfoot{\thepage /\pageref{LastPage}}  % pagenumbers   
+   
+	% \maketitle
+    
+	% \tableofcontents
+	% \pagebreak
+
+	% all contents of this documentation are in ./contents/*
+
+	% \input{contents/example.tex}
+	\inputencoding{utf8}	
+	\input{contents/planung.tex}
+	\input{contents/imp_funktionen.tex}
+	\pagebreak
+	\input{contents/handbuch.tex}
+
+	% \pagebreak
+	% \input{contents/bib.tex}
+\end{document}

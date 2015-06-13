@@ -1,0 +1,44 @@
+\ProvidesPackage{documentation}
+
+\usepackage{listings}  
+\usepackage[utf8]{inputenc}
+\usepackage{array, booktabs}
+\usepackage{longtable}
+\usepackage{graphicx}
+\usepackage{colortbl}
+\usepackage{caption}
+\usepackage{amsthm}
+\usepackage{amsmath}           
+\usepackage{amsfonts}          
+\usepackage{amssymb}
+\usepackage[%
+  %automark,
+  headsepline,                %% Separation line below the header
+%  footsepline,               %% Separation line above the footer
+  %markuppercase
+]{scrpage2}
+\usepackage{lastpage}          
+\usepackage[margin=10pt,font=small,labelfont=bf]{caption} 
+\usepackage{hyperref}
+\usepackage[parfill]{parskip}
+\newcommand{\myparagraph}[1]{
+	\paragraph{#1} \hspace{0pt} \\
+}
+\newcommand{\refp}[1]{\ref{#1} on page \pageref{#1}}
+\newcommand{\image}[4][.75]
+{
+%(width relative to linewidth = 0.75, image, caption, label)
+\begin{figure}[h]
+	\begin{center}
+		\includegraphics[width=#1\linewidth]{#2}
+		\caption{#3}
+		\label{#4}
+	\end{center}
+\end{figure}
+}
+
+\newcommand{\inlineimg}[2][0.75]
+{
+\raisebox{-.5\totalheight}{\includegraphics[width=0.1\textwidth]{#2}}
+}
+\renewcommand{\figurename}{Abb.}
