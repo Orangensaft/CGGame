@@ -16,6 +16,7 @@ import org.lwjgl.Sys;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
 
+import simplePrimitives.GameUtils.Sides;
 import de.matthiasmann.twl.utils.PNGDecoder;
 import de.matthiasmann.twl.utils.PNGDecoder.Format;
 
@@ -341,6 +342,10 @@ public class Game {
     private void loop() throws Exception {
     	Paddle paddleFront = new Paddle(new Vec3(.5,.5,1),false); //nach oben rechts verschoben
     	Paddle paddleBack = new Paddle(new Vec3(0,0,-1),true);
+    	//Rechte Wand, beginnt vorne unten rechts, 2 Breit, 2 Tief
+    	Wall wallRight = new Wall(new Vec3(1,-1,-1),Sides.right,2f,2f);
+    	Wall wallLeft = new Wall(new Vec3(-1,-1,-1),Sides.left,2f,2f);
+    	Wall wallTop = new Wall(new Vec3(-1,1,-1),Sides.top,2f,2f);
         // Run the rendering loop until the user has attempted to close
         // the window or has pressed the ESCAPE key.
         while ( glfwWindowShouldClose(window) == GL_FALSE ) {
@@ -383,6 +388,9 @@ public class Game {
             *Kugel
             *Vorderes Paddle
             */
+            wallTop.draw(pId);
+            wallLeft.draw(pId);
+            wallRight.draw(pId);
             paddleBack.draw(pId);
             paddleFront.draw(pId);
             //===============ENDE=========================
