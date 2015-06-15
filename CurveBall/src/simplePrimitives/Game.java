@@ -83,7 +83,7 @@ public class Game {
     private Matrix4 viewMatrix = null;
     private Matrix4 modelMatrix = null;
     private Vec3 modelAngle = new Vec3(0,0,0);
-    private Vec3 cameraPos = new Vec3(0,0,-4); //Kamera-Position
+    private Vec3 cameraPos = new Vec3(0,0,-3); //Kamera-Position
     private float deltaRot = 2.5f;
     
     // toggles & interactions
