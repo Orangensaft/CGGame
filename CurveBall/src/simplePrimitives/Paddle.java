@@ -10,7 +10,7 @@ import mat.Vec3;
  */
 public class Paddle {
 	private Vec3 pos; //Position
-	private float[] size = {.5f,.5f}; //Größe des Schlägers
+	private float[] size = {.5f,.5f}; //Größe des Schlägers; Breite/Höhe
 	
 	/**
 	 * Schläger erstellen
@@ -27,8 +27,28 @@ public class Paddle {
 	private void draw(){
 		/*
 		 * TODO:
-		 * Schläger berechnen und in Grafikkarte werfen
+		 * Vertices in Grafikkarte werfen
 		 */
+		//Vertices
+		float[] verts = new float[4*3];
+		int i=0;
+		//Unten Links
+		verts[i++]=(float) (pos.x-size[0]/2f);
+		verts[i++]=(float) (pos.y-size[1]/2f);
+		verts[i++]=(float) (pos.z);
+		//Unten Rechts
+		verts[i++]=(float) (pos.x+size[0]/2f);
+		verts[i++]=(float) (pos.y-size[1]/2f);
+		verts[i++]=(float) (pos.z);
+		//Oben Rechts
+		verts[i++]=(float) (pos.x+size[0]/2f);
+		verts[i++]=(float) (pos.y+size[1]/2f);
+		verts[i++]=(float) (pos.z);
+		//Oben Links
+		verts[i++]=(float) (pos.x-size[0]/2f);
+		verts[i++]=(float) (pos.y+size[1]/2f);
+		verts[i++]=(float) (pos.z);
+		
 	}
 	
 	public Vec3 getPos(){

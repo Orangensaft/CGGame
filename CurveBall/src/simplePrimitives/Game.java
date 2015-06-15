@@ -36,7 +36,7 @@ import static org.lwjgl.system.MemoryUtil.*;
 // matrix Utilities was removed with lwjgl3, we use our own
 import mat.*;
 
-public class simplePrimitives {
+public class Game {
  
     // We need to strongly reference callback instances.
     private GLFWErrorCallback errorCallback;
@@ -699,7 +699,7 @@ public class simplePrimitives {
 	}
 	
     public static void main(String[] args) {
-        new simplePrimitives().run();
+        new Game().run();
     }
  
 }
