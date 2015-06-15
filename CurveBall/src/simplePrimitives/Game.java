@@ -158,6 +158,11 @@ public class Game {
             		if (showMesh) glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
             		else glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
             	}
+            	
+            	if (key == GLFW_KEY_R && action == GLFW_PRESS){
+            		modelAngle.y = 0;
+            	}
+            	
             	if ( key == GLFW_KEY_N && action == GLFW_PRESS )
             		showNormals = !showNormals;
             	if ( key == GLFW_KEY_T && action == GLFW_PRESS ){
@@ -564,7 +569,9 @@ public class Game {
             float worldX = GameUtils.mousetoWorld(xpos, WIDTH);
             //*-1 weil fenster koordinaten oben links beginnen
             float worldY = -1*GameUtils.mousetoWorld(ypos, HEIGHT);
-            System.out.println("X:"+xpos+", Y:"+ypos+" => XW="+worldX+", YW:"+worldY);
+            //System.out.println("X:"+xpos+", Y:"+ypos+" => XW="+worldX+", YW:"+worldY);
+            
+            //==================================Objekte updaten=================================
             
             paddleFront.setPos(worldX, worldY);
             // ================================== Draw objects =====================================
