@@ -33,6 +33,7 @@ public class Paddle {
 	public int textureID;
 	private int indicesCount;
 	private String tex="";
+	private int verticesCount;
 	/**
 	 * Schläger erstellen
 	 * @param pos ZENTRUM des Schlägers
@@ -74,7 +75,7 @@ public class Paddle {
 		FloatBuffer verticesBuffer = BufferUtils.createFloatBuffer(verts.length);
 		verticesBuffer.put(verts);
 		verticesBuffer.flip();
-		int verticesCount = verts.length/3;
+		verticesCount = verts.length/3;
 		
 		//Farben
 		float[] colors = {
@@ -101,10 +102,10 @@ public class Paddle {
 		
 		//Texturkoords
 		float[] textureCoords = {
-				0f,0f,
-				1f,0f,
+				0f,1f,
 				1f,1f,
-				0f,1f
+				1f,0f,
+				0f,0f
 				};
 		FloatBuffer textureCoordsBuffer = BufferUtils.createFloatBuffer(textureCoords.length);
 		textureCoordsBuffer.put(textureCoords);
@@ -227,7 +228,7 @@ public class Paddle {
 		//Paddle zeichen
 		GL20.glUseProgram(pId);
         // Bind to the VAO that has all the information about the vertices
-		textureID = GameUtils.loadPNGTexture("assets/paddle.png", GL13.GL_TEXTURE0);
+		textureID = GameUtils.loadPNGTexture(tex, GL13.GL_TEXTURE0);
         GL30.glBindVertexArray(vaoId);
         GL20.glEnableVertexAttribArray(0);
         GL20.glEnableVertexAttribArray(1);

@@ -3,6 +3,7 @@
 *.tmp
 *.bak
 *.swp
+thumbs.db
 
 local.properties
 # Eclipse Core
