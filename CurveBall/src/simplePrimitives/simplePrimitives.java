@@ -240,7 +240,7 @@ public class simplePrimitives {
     private void setupMatrices() {
      	
     	// Setup projection and view matrix
-    	projectionMatrix = new PerspectiveMatrix(-1,1,-1,1,-1,1);
+    	projectionMatrix = new PerspectiveMatrix(GameUtils.near,GameUtils.far,GameUtils.left,GameUtils.right,GameUtils.bottom,GameUtils.top);
     	viewMatrix = new TranslationMatrix(cameraPos);
     }
     
