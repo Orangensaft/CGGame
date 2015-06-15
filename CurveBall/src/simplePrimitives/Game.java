@@ -15,6 +15,7 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.Sys;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
+import org.lwjgl.openal.*;
 
 import simplePrimitives.GameUtils.Sides;
 import de.matthiasmann.twl.utils.PNGDecoder;
@@ -361,6 +362,7 @@ public class Game {
     	float delta;
     	float timeCount=0;
     	int fpsCount = 0;
+    	
         while ( glfwWindowShouldClose(window) == GL_FALSE ) {
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
         	time = getTime();
