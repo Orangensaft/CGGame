@@ -16,6 +16,8 @@ import org.lwjgl.Sys;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
 import org.lwjgl.openal.*;
+import org.newdawn.slick.openal.AudioLoader;
+import org.newdawn.slick.util.ResourceLoader;
 
 import simplePrimitives.GameUtils.Sides;
 import de.matthiasmann.twl.utils.PNGDecoder;
@@ -225,6 +227,16 @@ public class Game {
         
         // Draw thicker lines
         GL11.glLineWidth(2);
+        
+        
+        //SOUNDS LADEN
+        try {
+        	GameUtils.waveEffect = AudioLoader.getAudio("WAV", ResourceLoader.getResourceAsStream("assets/can.wav"));
+        }catch(Exception ex){
+        	
+        }
+        
+        
         
     }
     

@@ -2,15 +2,14 @@ package simplePrimitives;
 
 
 import java.io.FileInputStream;
-
 import java.io.IOException;
 import java.io.InputStream;
-
 import java.nio.ByteBuffer;
 
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL30;
+import org.newdawn.slick.openal.Audio;
 
 import de.matthiasmann.twl.utils.PNGDecoder;
 import de.matthiasmann.twl.utils.PNGDecoder.Format;
@@ -33,6 +32,7 @@ public abstract class GameUtils {
 	public static float bottom=1f;
 	public static float top=-1f;
 	public static float fps;
+	public static Audio waveEffect;
 	
 	public static float mousetoWorld(double mousePos,int max){
 		return (float) ((mousePos*1f/(max/2f))-1);
