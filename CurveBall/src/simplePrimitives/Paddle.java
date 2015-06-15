@@ -32,14 +32,19 @@ public class Paddle {
 	public int vbonlcId;
 	public int textureID;
 	private int indicesCount;
-	
+	private String tex="";
 	/**
 	 * Schläger erstellen
 	 * @param pos ZENTRUM des Schlägers
 	 */
-	public Paddle(Vec3 pos){
+	public Paddle(Vec3 pos,boolean front){
 		this.pos = pos;
-		textureID = GameUtils.loadPNGTexture("assets/paddle.png", GL13.GL_TEXTURE0);
+		if (front)
+			tex = "assets/paddle.png";
+			//textureID = GameUtils.loadPNGTexture("assets/paddle.png", GL13.GL_TEXTURE0);
+		else
+			tex = "assets/paddleb.png";
+			//textureID = GameUtils.loadPNGTexture("assets/paddleb.png", GL13.GL_TEXTURE0);
 		updateGraphics();
 	}
 	
@@ -47,11 +52,6 @@ public class Paddle {
 	 * Schläger berechnen
 	 */
 	private void updateGraphics(){
-		/*
-		 * TODO:
-		 * Vertices in Grafikkarte werfen
-		 */
-		
 		//Vertices
 		float[] verts = new float[4*3];
 		int i=0;
@@ -227,6 +227,7 @@ public class Paddle {
 		//Paddle zeichen
 		GL20.glUseProgram(pId);
         // Bind to the VAO that has all the information about the vertices
+		textureID = GameUtils.loadPNGTexture("assets/paddle.png", GL13.GL_TEXTURE0);
         GL30.glBindVertexArray(vaoId);
         GL20.glEnableVertexAttribArray(0);
         GL20.glEnableVertexAttribArray(1);

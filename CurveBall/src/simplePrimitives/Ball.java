@@ -36,7 +36,6 @@ public class Ball {
 	 */
 	private void updateDirections(Paddle a, Paddle b){
 		//Kollisionsabfrage
-		//aktuell noch extrem simpel mit 45° Winkeln
 		Sides col = checkCols();
 		if (col == Sides.left || col==Sides.right){
 			direction.x = -direction.x;

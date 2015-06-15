@@ -537,8 +537,8 @@ public class Game {
     }
     
     private void loop() throws Exception {
-    	Paddle paddleFront = new Paddle(new Vec3(.5,.5,1)); //nach oben rechts verschoben
-    	Paddle paddleBack = new Paddle(new Vec3(0,0,-1));
+    	Paddle paddleFront = new Paddle(new Vec3(.5,.5,1),false); //nach oben rechts verschoben
+    	Paddle paddleBack = new Paddle(new Vec3(0,0,-1),true);
         // Run the rendering loop until the user has attempted to close
         // the window or has pressed the ESCAPE key.
         while ( glfwWindowShouldClose(window) == GL_FALSE ) {
@@ -572,9 +572,8 @@ public class Game {
             //System.out.println("X:"+xpos+", Y:"+ypos+" => XW="+worldX+", YW:"+worldY);
             
             //==================================Objekte updaten=================================
-            
             paddleFront.setPos(worldX, worldY);
-            // ================================== Draw objects =====================================
+            // ================================== Draw objects =================================
             /*Hier die Objekte von hinten nach vorne zeichen
             *-> Painters-Algo
             *Wände
@@ -584,65 +583,8 @@ public class Game {
             */
             paddleBack.draw(pId);
             paddleFront.draw(pId);
-            /*
-            GL20.glUseProgram(pId);
-
-            // Bind to the VAO that has all the information about the vertices
-            GL30.glBindVertexArray(vaoId);
-            GL20.glEnableVertexAttribArray(0);
-            GL20.glEnableVertexAttribArray(1);
-            GL20.glEnableVertexAttribArray(2);
-            GL20.glEnableVertexAttribArray(3); // texture coordinates
-             
-            // Bind to the index VBO that has all the information about the order of the vertices
-            GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, vboiId);
-             
-            // Draw the vertices
-            GL11.glDrawElements(GL11.GL_TRIANGLE_STRIP, indicesCount, GL11.GL_UNSIGNED_INT, 0);
-            
-            // Put everything back to default (deselect)
-            GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0);
-            GL20.glDisableVertexAttribArray(0);
-            GL20.glDisableVertexAttribArray(1);
-            GL20.glDisableVertexAttribArray(2);
-            GL20.glDisableVertexAttribArray(3);
-            GL30.glBindVertexArray(0);
-            GL20.glUseProgram(0);
-            */
-            // ================================ Draw normal lines =================================
-            /*
-            if (showNormals){
-	            
-	            GL20.glUseProgram(pNormalsId);
-	            
-	            // Upload matrices to the uniform variables
-	            GL20.glUniformMatrix4fv(projectionMatrixLocationNormals, false , toFFB(projectionMatrix));
-	            GL20.glUniformMatrix4fv(viewMatrixLocationNormals, false, toFFB(viewMatrix));
-	            GL20.glUniformMatrix4fv(modelMatrixLocationNormals, false, toFFB(modelMatrix));
-	             
-	            // Bind to the VAO that has all the information about the normal lines
-	            GL30.glBindVertexArray(vaoNormalLinesId);
-	            GL20.glEnableVertexAttribArray(0);
-	            GL20.glEnableVertexAttribArray(1);
-	             
-	            // Bind to the VBO that has all the information about the order of the vertices
-	            GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vbonlId);
-	             
-	            // Draw the vertices
-	            GL11.glDrawArrays(GL11.GL_LINES, 0, verticesCount*2);
-	            
-	            // Put everything back to default (deselect)
-	            GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0);
-	            GL20.glDisableVertexAttribArray(0);
-	            GL20.glDisableVertexAttribArray(1);
-	            GL30.glBindVertexArray(0);
-	            GL20.glUseProgram(0);
-            }
-            */
-            // Swap the color buffer. We never draw directly to the screen, only in this buffer. So we need to display it
+            //===============ENDE=========================
     		glfwSwapBuffers(window);
-            
-            // Poll for window events. The key callback above will only be invoked during this call.
             glfwPollEvents();
         }
     }
