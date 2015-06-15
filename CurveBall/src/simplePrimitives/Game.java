@@ -25,6 +25,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
+import java.nio.DoubleBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
@@ -82,8 +83,8 @@ public class Game {
     private Matrix4 viewMatrix = null;
     private Matrix4 modelMatrix = null;
     private Vec3 modelAngle = new Vec3(0,0,0);
-    private Vec3 cameraPos = new Vec3(0,0,-5); //Kamera-Position
-    private float deltaRot = 5f;
+    private Vec3 cameraPos = new Vec3(0,0,-4); //Kamera-Position
+    private float deltaRot = 2.5f;
     
     // toggles & interactions
     private boolean showMesh = true;
@@ -176,6 +177,7 @@ public class Game {
             		else
             			useNormalColoring=1;
             	}
+            	
             }
         });
    
@@ -530,35 +532,52 @@ public class Game {
     }
     
     private void loop() throws Exception {
-    	
+    	Paddle paddleFront = new Paddle(new Vec3(.5,.5,1)); //nach oben rechts verschoben
+    	Paddle paddleBack = new Paddle(new Vec3(0,0,-1));
         // Run the rendering loop until the user has attempted to close
         // the window or has pressed the ESCAPE key.
         while ( glfwWindowShouldClose(window) == GL_FALSE ) {
         	
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
 
-        	
-            // =============================== Update matrices ====================================
-            
-            // first translate, then rotate. Remember the flipped order
+            //matrix inits etc.
             modelMatrix = new TranslationMatrix(new Vec3(0,0,1));  // translate...
             modelMatrix = (Matrix4) new RotationMatrix(modelAngle.y, mat.Axis.Y).mul(modelMatrix); // ... and rotate, multiply matrices 
-            
-            // Upload matrices to the uniform variables to shader program 0
             GL20.glUseProgram(pId);
-             
             GL20.glUniformMatrix4fv(projectionMatrixLocation, false , toFFB(projectionMatrix));
             GL20.glUniformMatrix4fv(viewMatrixLocation, false, toFFB(viewMatrix));
             GL20.glUniformMatrix4fv(modelMatrixLocation, false, toFFB(modelMatrix));
-            
-            // Upload normal coloring and texture toggle
             GL20.glUniform1i(useNormalColoringLocation, useNormalColoring);
             GL20.glUniform1i(useTextureLocation, useTexture);
-             
             GL20.glUseProgram(0);
-
-            // ================================== Draw object =====================================
             
+            //Mausposition abgreifen
+            DoubleBuffer x = BufferUtils.createDoubleBuffer(1);
+            DoubleBuffer y = BufferUtils.createDoubleBuffer(1);
+            glfwGetCursorPos(window,x,y);
+            double xpos=x.get();
+            xpos = xpos>=0 ? xpos : 0;
+            xpos = xpos<=WIDTH ? xpos : WIDTH; 
+            double ypos=y.get();
+            ypos = ypos>=0 ? ypos : 0;
+            ypos = ypos<=HEIGHT ? ypos : HEIGHT;
+            float worldX = GameUtils.mousetoWorld(xpos, WIDTH);
+            //*-1 weil fenster koordinaten oben links beginnen
+            float worldY = -1*GameUtils.mousetoWorld(ypos, HEIGHT);
+            System.out.println("X:"+xpos+", Y:"+ypos+" => XW="+worldX+", YW:"+worldY);
+            
+            paddleFront.setPos(worldX, worldY);
+            // ================================== Draw objects =====================================
+            /*Hier die Objekte von hinten nach vorne zeichen
+            *-> Painters-Algo
+            *Wände
+            *Hinteres Paddle
+            *Kugel
+            *Vorderes Paddle
+            */
+            paddleBack.draw(pId);
+            paddleFront.draw(pId);
+            /*
             GL20.glUseProgram(pId);
 
             // Bind to the VAO that has all the information about the vertices
@@ -582,9 +601,9 @@ public class Game {
             GL20.glDisableVertexAttribArray(3);
             GL30.glBindVertexArray(0);
             GL20.glUseProgram(0);
-            
+            */
             // ================================ Draw normal lines =================================
-            
+            /*
             if (showNormals){
 	            
 	            GL20.glUseProgram(pNormalsId);
@@ -612,7 +631,7 @@ public class Game {
 	            GL30.glBindVertexArray(0);
 	            GL20.glUseProgram(0);
             }
-            
+            */
             // Swap the color buffer. We never draw directly to the screen, only in this buffer. So we need to display it
     		glfwSwapBuffers(window);
             

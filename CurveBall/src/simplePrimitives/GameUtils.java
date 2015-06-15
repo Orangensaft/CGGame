@@ -5,6 +5,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 
+import mat.PerspectiveMatrix;
+import mat.TranslationMatrix;
+
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL30;
@@ -27,8 +30,14 @@ public abstract class GameUtils {
 	public static float far=1f;
 	public static float left=-1f;
 	public static float right=1f;
-	public static float bottom=-1f;
-	public static float top=1f;
+	public static float bottom=1f;
+	public static float top=-1f;
+
+	
+	public static float mousetoWorld(double mousePos,int max){
+		return (float) ((mousePos*1f/(max/2f))-1);
+	}
+	
 	
 	 /**
      * Uses an external class to load a PNG image and bind it as texture

@@ -5,6 +5,7 @@ import java.nio.IntBuffer;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
@@ -29,6 +30,8 @@ public class Paddle {
 	public int vaoNormalLinesId;
 	public int vbonlId;
 	public int vbonlcId;
+	public int textureID;
+	private int indicesCount;
 	
 	/**
 	 * Schläger erstellen
@@ -36,13 +39,14 @@ public class Paddle {
 	 */
 	public Paddle(Vec3 pos){
 		this.pos = pos;
-		draw();
+		textureID = GameUtils.loadPNGTexture("assets/paddle.png", GL13.GL_TEXTURE0);
+		updateGraphics();
 	}
 	
 	/**
-	 * Schläger zeichen
+	 * Schläger berechnen
 	 */
-	private void draw(){
+	private void updateGraphics(){
 		/*
 		 * TODO:
 		 * Vertices in Grafikkarte werfen
@@ -109,7 +113,7 @@ public class Paddle {
 		//Indizes
 		// OpenGL expects to draw the first vertices in counter clockwise order by default
 		int[] indices = {1,2,0,3};	
-		int indicesCount = indices.length;
+		indicesCount = indices.length;
 		IntBuffer indicesBuffer = BufferUtils.createIntBuffer(indicesCount);
 		indicesBuffer.put(indices);
 		indicesBuffer.flip();
@@ -216,6 +220,30 @@ public class Paddle {
         
         // Deselect (bind to 0) the VAO
      	GL30.glBindVertexArray(0);
+     	
+	}
+	
+	public void draw(int pId){
+		//Paddle zeichen
+		GL20.glUseProgram(pId);
+        // Bind to the VAO that has all the information about the vertices
+        GL30.glBindVertexArray(vaoId);
+        GL20.glEnableVertexAttribArray(0);
+        GL20.glEnableVertexAttribArray(1);
+        GL20.glEnableVertexAttribArray(2);
+        GL20.glEnableVertexAttribArray(3); // texture coordinates
+        // Bind to the index VBO that has all the information about the order of the vertices
+        GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, vboiId);
+        // Draw the vertices
+        GL11.glDrawElements(GL11.GL_TRIANGLE_STRIP, indicesCount, GL11.GL_UNSIGNED_INT, 0);
+        // Put everything back to default (deselect)
+        GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0);
+        GL20.glDisableVertexAttribArray(0);
+        GL20.glDisableVertexAttribArray(1);
+        GL20.glDisableVertexAttribArray(2);
+        GL20.glDisableVertexAttribArray(3);
+        GL30.glBindVertexArray(0);
+        GL20.glUseProgram(0);
 	}
 	
 	public Vec3 getPos(){
@@ -225,4 +253,11 @@ public class Paddle {
 	public float[] getSize(){
 		return this.size;
 	}
+	
+	public void setPos(float x, float y){
+		pos.x = x;
+		pos.y = y;
+		updateGraphics();
+	}
+	
 }
