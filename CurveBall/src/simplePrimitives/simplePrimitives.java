@@ -83,7 +83,7 @@ public class simplePrimitives {
     private Matrix4 viewMatrix = null;
     private Matrix4 modelMatrix = null;
     private Vec3 modelAngle = new Vec3(0,0,0);
-    private Vec3 cameraPos = new Vec3(0,0,-1.4);
+    private Vec3 cameraPos = new Vec3(0,0,-5); //Kamera-Position
     private float deltaRot = 5f;
     private float normalScale=0.1f;
     
@@ -140,7 +140,7 @@ public class simplePrimitives {
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
  
         // Create the window
-        window = glfwCreateWindow(WIDTH, HEIGHT, "Hello World!", NULL, NULL);
+        window = glfwCreateWindow(WIDTH, HEIGHT, "CurveBall by Jan F. & Nicolas M.", NULL, NULL);
         if ( window == NULL )
             throw new RuntimeException("Failed to create the GLFW window");
  
@@ -240,7 +240,7 @@ public class simplePrimitives {
     private void setupMatrices() {
      	
     	// Setup projection and view matrix
-    	projectionMatrix = new PerspectiveMatrix(-1,1,-1,1,0.1f,3);
+    	projectionMatrix = new PerspectiveMatrix(-1,1,-1,1,-1,1);
     	viewMatrix = new TranslationMatrix(cameraPos);
     }
     
