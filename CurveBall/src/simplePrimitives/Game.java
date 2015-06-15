@@ -91,7 +91,7 @@ public class Game {
     private boolean useBackfaceCulling = false;
     private int useNormalColoring = 0;
     private int useNormalColoringLocation = 0;
-    private int useTexture = 0;
+    private int useTexture = 1;
     private int useTextureLocation = 0;
   	
     public void run() {
