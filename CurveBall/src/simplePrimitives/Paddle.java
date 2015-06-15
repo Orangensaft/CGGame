@@ -11,16 +11,15 @@ import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 
 import mat.Vec3;
-
-
+import simplePrimitives.GameUtils;
 /**
- * Klasse für die Schläger
+ * Klasse fï¿½r die Schlï¿½ger
  * @author Nicolas
- *
+ * @author Jan
  */
 public class Paddle {
 	private Vec3 pos; //Position
-	private float[] size = {.5f,.5f}; //Größe des Schlägers; Breite/Höhe
+	private float[] size = {.5f,.5f}; //Grï¿½ï¿½e des Schlï¿½gers; Breite/Hï¿½he
 	public int vaoId;
 	public int vboId;
 	public int vbocId;
@@ -31,15 +30,20 @@ public class Paddle {
 	public int vbonlId;
 	public int vbonlcId;
 	public int textureID;
+
+	// slope variables for ball curve
+	private Vec3 slope;
+
 	private int indicesCount;
 	private String tex="";
 	private int verticesCount;
 	/**
-	 * Schläger erstellen
-	 * @param pos ZENTRUM des Schlägers
+	 * Schlï¿½ger erstellen
+	 * @param pos ZENTRUM des Schlï¿½gers
 	 */
 	public Paddle(Vec3 pos,boolean front){
 		this.pos = pos;
+		this.slope = new Vec3(0d, 0d, 0d);
 		if (front)
 			tex = "assets/paddle.png";
 			//textureID = GameUtils.loadPNGTexture("assets/paddle.png", GL13.GL_TEXTURE0);
@@ -50,7 +54,7 @@ public class Paddle {
 	}
 	
 	/**
-	 * Schläger berechnen
+	 * Schlï¿½ger berechnen
 	 */
 	private void updateGraphics(){
 		//Vertices
@@ -251,15 +255,20 @@ public class Paddle {
 	public Vec3 getPos(){
 		return this.pos;
 	}
+
+	public Vec3 getSlope(){
+		return this.slope;	
+	}
 	
 	public float[] getSize(){
 		return this.size;
 	}
 	
 	public void setPos(float x, float y){
+		slope.x = (x - pos.x)/(1d/GameUtils.fps);
+		slope.y = (y - pos.y)/(1d/GameUtils.fps);
 		pos.x = x;
 		pos.y = y;
 		updateGraphics();
 	}
-	
 }
