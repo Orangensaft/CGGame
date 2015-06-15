@@ -9,5 +9,6 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="matrices.jar"/>
+	<classpathentry kind="lib" path="slick-util.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -1,16 +1,13 @@
 package simplePrimitives;
 
+
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
+
 import java.io.IOException;
 import java.io.InputStream;
+
 import java.nio.ByteBuffer;
 
-import mat.PerspectiveMatrix;
-import mat.TranslationMatrix;
-
-import org.lwjgl.openal.*;
-import org.lwjgl.openal.AL10;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL30;
@@ -101,20 +98,9 @@ public abstract class GameUtils {
 
         return texId;
     }
+  
     
     
-    public static int loadWave(String input){
-    	FileInputStream fin = null;
-    	try{
-    		fin = new FileInputStream(input);
-
-    	}
-		catch(FileNotFoundException ex){
-			ex.printStackTrace();
-			return AL10.AL_FALSE;
-		}
-    	//WaveData waveFile = WaveData.create(fin);
-    	return 0;
-    }
+    
 	
 }

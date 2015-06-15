@@ -422,6 +422,7 @@ public class Game {
     		glfwSwapBuffers(window);
             glfwPollEvents();
         }
+        //AL.destroy();
     }
     
     /**
