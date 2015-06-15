@@ -346,6 +346,7 @@ public class Game {
     	Wall wallRight = new Wall(new Vec3(1,-1,-1),Sides.right,2f,2f);
     	Wall wallLeft = new Wall(new Vec3(-1,-1,-1),Sides.left,2f,2f);
     	Wall wallTop = new Wall(new Vec3(-1,1,-1),Sides.top,2f,2f);
+    	Wall wallBot = new Wall(new Vec3(-1,-1,-1),Sides.bottom,2f,2f);
         // Run the rendering loop until the user has attempted to close
         // the window or has pressed the ESCAPE key.
         while ( glfwWindowShouldClose(window) == GL_FALSE ) {
@@ -391,6 +392,7 @@ public class Game {
             wallTop.draw(pId);
             wallLeft.draw(pId);
             wallRight.draw(pId);
+            wallBot.draw(pId);
             paddleBack.draw(pId);
             paddleFront.draw(pId);
             //===============ENDE=========================
