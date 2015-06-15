@@ -32,7 +32,7 @@ public abstract class GameUtils {
 	public static float right=1f;
 	public static float bottom=1f;
 	public static float top=-1f;
-
+	public static float fps;
 	
 	public static float mousetoWorld(double mousePos,int max){
 		return (float) ((mousePos*1f/(max/2f))-1);

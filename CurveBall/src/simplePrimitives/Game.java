@@ -339,7 +339,15 @@ public class Game {
         modelMatrixLocationNormals = GL20.glGetUniformLocation(pNormalsId, "modelMatrix");        
     }
 
+    public double getTime() {
+        return glfwGetTime();
+    }
+    
+    
+    
+    
     private void loop() throws Exception {
+    	
     	Paddle paddleFront = new Paddle(new Vec3(.5,.5,1),false); //nach oben rechts verschoben
     	Paddle paddleBack = new Paddle(new Vec3(0,0,-1),true);
     	//Rechte Wand, beginnt vorne unten rechts, 2 Breit, 2 Tief
@@ -347,12 +355,25 @@ public class Game {
     	Wall wallLeft = new Wall(new Vec3(-1,-1,-1),Sides.left,2f,2f);
     	Wall wallTop = new Wall(new Vec3(-1,1,-1),Sides.top,2f,2f);
     	Wall wallBot = new Wall(new Vec3(-1,-1,-1),Sides.bottom,2f,2f);
-        // Run the rendering loop until the user has attempted to close
-        // the window or has pressed the ESCAPE key.
+    	
+    	double lastLoopTime = getTime();
+    	double time;
+    	float delta;
+    	float timeCount=0;
+    	int fpsCount = 0;
         while ( glfwWindowShouldClose(window) == GL_FALSE ) {
-        	
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
-
+        	time = getTime();
+        	delta = (float) (time-lastLoopTime);
+        	lastLoopTime=time;
+        	timeCount += delta;
+        	fpsCount++;
+        	if(timeCount > 1f){
+        		GameUtils.fps = fpsCount;
+        		fpsCount=0;
+        		timeCount -=1f;
+        	}
+        	System.out.println(GameUtils.fps);
             //matrix inits etc.
             modelMatrix = new TranslationMatrix(new Vec3(0,0,1));  // translate...
             modelMatrix = (Matrix4) new RotationMatrix(modelAngle.y, mat.Axis.Y).mul(modelMatrix); // ... and rotate, multiply matrices 
