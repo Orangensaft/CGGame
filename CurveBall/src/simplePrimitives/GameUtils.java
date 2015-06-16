@@ -170,6 +170,7 @@ public abstract class GameUtils {
 				if (i == rint) {
 					if (Playing != null) {
 						Playing.end();
+						Playing.interrupt();
 					}	
 					Playing = new AudioThread(SoundBoard[n]);
 					Playing.run();
