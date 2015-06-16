@@ -44,6 +44,13 @@ public abstract class GameUtils {
 	public static float fps;
 	public static double time;
 	public static double last_sound = 0;
+	
+	private static int lives=3;
+	private static int lvl=1;
+	public static Heart[] hearts = new Heart[3];
+	
+	public static boolean isPaused=true;
+	
 	public static Audio waveEffect;
 
 	public static enum SoundType {PaddleCol, WallCol, Point, dummy};
@@ -62,6 +69,26 @@ public abstract class GameUtils {
 		return (float) ((mousePos*1f/(max/2f))-1);
 	}
 	
+	public static void setLives(int n){
+		lives=n;
+		for (int i=0;i<3;i++){
+			hearts[i].setVisible(false);
+		}
+		for (int i=0;i<n;i++){
+			hearts[i].setVisible(true);
+		}	
+	}
+	
+	public static void drawHearts(int pId){
+		for (int i=0;i<3;i++){
+			hearts[i].draw(pId);
+		}
+	}
+	
+	
+	public static int getLives(){
+		return lives;
+	}
 	
 	
 	

@@ -225,7 +225,7 @@ public class Game {
         GL11.glViewport(0, 0, WIDTH, HEIGHT);
         
         // Set the clear color - gray
-        glClearColor(0.3f, 0.3f, 0.3f, 0.0f);
+        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         
         // Switch to wireframe
         glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
@@ -245,6 +245,13 @@ public class Game {
 	//Make BGM loop
 	GameUtils.bg.setLoop(true);
 	GameUtils.bg.play(true);
+	
+	Vec3 hPos = new Vec3(-1.2,1.2,1);
+	System.out.println("INIT");
+	for (int i=0;i<3;i++){
+		GameUtils.hearts[i] = new Heart(hPos);
+		hPos.x += 0.125;
+	}
 	
 	
 	// Initialize Sound Board
@@ -446,6 +453,7 @@ public class Game {
             wallBot.draw(pId);
             paddleBack.draw(pId);
             paddleFront.draw(pId);
+            GameUtils.drawHearts(pId);
             //===============ENDE=========================
     	    glfwSwapBuffers(window);
             glfwPollEvents();
