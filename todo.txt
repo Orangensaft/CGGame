@@ -1,0 +1,20 @@
+========Texturierte Levelobjekte==========6
+-Kugel darstellen + Textur
+
+===========Spiellogik============4
+-Spielstart ball richtung Gegner
+-Flugbahn/Winkel im Bezug zum Schläger
+-KI
+-Gewinnen -> KI wird besser
+=> (Ball Schneller / KI schneller / Schlägergröße)
+-Extraleben
+=============Interaktion==============3
+-Starten des Spiels
+-Reset
+-Pause
+============Spielanzeige===============2
+-Punkte Anzeigen
+-Leben
+=========BONUS=================5
+-(Sound)
+-(Flugbahn)
