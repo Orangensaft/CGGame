@@ -7,6 +7,11 @@
   * http://wiki.lwjgl.org/wiki/The_Quad_with_DrawElements and the other Quad-parts
   * getting started: http://www.lwjgl.org/guide
   * http://hg.l33tlabs.org/twl/file/tip/src/de/matthiasmann/twl/utils/PNGDecoder.java
+  * 
+  * TinySound:
+  * https://github.com/finnkuusisto/TinySound
+  * Sounds:
+  * https://www.freesound.org/
   */
 
 package simplePrimitives;
@@ -22,11 +27,11 @@ import org.newdawn.slick.util.ResourceLoader;
 
 import simplePrimitives.GameUtils.Sides;
 import simplePrimitives.GameUtils.SoundType;
-
 import de.matthiasmann.twl.utils.PNGDecoder;
 import de.matthiasmann.twl.utils.PNGDecoder.Format;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
@@ -36,6 +41,9 @@ import java.nio.DoubleBuffer;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
+import kuusisto.tinysound.Music;
+import kuusisto.tinysound.Sound;
+import kuusisto.tinysound.TinySound;
 import static org.lwjgl.glfw.Callbacks.*;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11.*;
@@ -233,13 +241,28 @@ public class Game {
         // Draw thicker lines
         GL11.glLineWidth(2);
         
+	
+	//Load TinySound
+    TinySound.init();
+    //Load Sounds
+	GameUtils.bg = TinySound.loadMusic(new File("assets/bg.wav"));
+	GameUtils.sndHit = TinySound.loadSound(new File("assets/can.wav"));
+	GameUtils.sndPoint = TinySound.loadSound(new File("assets/point.wav"));
+	//Make BGM loop
+	GameUtils.bg.setLoop(true);
+	GameUtils.bg.play(true);
+	
+	
 	// Initialize Sound Board
+	/*
 	String[] sounds = {"can.wav", "can.wav"};
-	SoundType[] context = {SoundType.paddleCol, SoundType.WallCol};
+	SoundType[] context = {SoundType.PaddleCol, SoundType.WallCol};
 	GameUtils.initSoundBoard(sounds, context);
         GameUtils.Request = null;
 	GameUtils.Playing = null;
 	GameUtils.played = false;
+	*/
+	
     }
     
     
@@ -440,13 +463,19 @@ public class Game {
     	    glfwSwapBuffers(window);
             glfwPollEvents();
 	    // Poll to allow streaming queues
+        
+            /*
 	    SoundStore.get().poll(0);
 	    if (GameUtils.Request != null) {
 	        GameUtils.Playing = GameUtils.Request;
 	        GameUtils.played = false;
 	        GameUtils.Request = null;
 	    }
+	    */
+	    
         }
+        GameUtils.bg.stop();
+        TinySound.shutdown();
         //AL.destroy();
     }
     

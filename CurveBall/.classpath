@@ -9,6 +9,10 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="matrices.jar"/>
-	<classpathentry kind="lib" path="slick-util.jar"/>
+	<classpathentry kind="lib" path="slick-util.jar">
+		<attributes>
+			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="CurveBall/lwjgl/native"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

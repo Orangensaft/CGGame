@@ -7,6 +7,9 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.util.Random;
 
+import kuusisto.tinysound.Music;
+import kuusisto.tinysound.Sound;
+
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL30;
@@ -48,9 +51,20 @@ public abstract class GameUtils {
 	public static Audio Playing;
 	public static boolean played;
 	public static Random rand = new Random();
+	
+	//TinySound, Soundfiles
+	public static Music bg;
+	public static Sound sndHit;
+	public static Sound sndPoint;
+	
+	
 	public static float mousetoWorld(double mousePos,int max){
 		return (float) ((mousePos*1f/(max/2f))-1);
 	}
+	
+	
+	
+	
 	
 	
 	 /**

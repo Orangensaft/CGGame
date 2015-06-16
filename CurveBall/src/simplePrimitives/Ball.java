@@ -63,19 +63,22 @@ public class Ball {
 		//Kollisionsabfrage
 		Sides col = checkCols();
 		if (col == Sides.left || col==Sides.right){
-			GameUtils.requestSound(SoundType.WallCol);
+			//GameUtils.requestSound(SoundType.WallCol);
+			GameUtils.sndHit.play();
 			direction.x = -direction.x;
 			spin.x = -spin.x;
 			pos.x = col == Sides.left ? GameUtils.left + r : GameUtils.right - r;
 		}
 		if (col == Sides.top || col == Sides.bottom){
-			GameUtils.requestSound(SoundType.WallCol);
+			//GameUtils.requestSound(SoundType.WallCol);
+			GameUtils.sndHit.play();
 			direction.y = -direction.y;
 			spin.y = - spin.y;
 			pos.y = col == Sides.top ? GameUtils.top - r : GameUtils.bottom + r; 
 		}
 		if (hitsPaddles(a,b)){
-			GameUtils.requestSound(SoundType.PaddleCol);
+			//GameUtils.requestSound(SoundType.PaddleCol);
+			GameUtils.sndHit.play();
 			direction.z = -direction.z;
 
 		}
