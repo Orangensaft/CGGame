@@ -159,6 +159,15 @@ public class Game {
             		modelAngle.y = 0;
             	}
             	
+            	if (key == GLFW_KEY_Q && action == GLFW_PRESS){
+            		GameUtils.setLives((GameUtils.getLives()+1)%4);
+            	}
+            	
+            	if (key == GLFW_KEY_E && action == GLFW_PRESS){
+            		GameUtils.setLevel((GameUtils.getLevel()+1)%11);
+            	}
+            	
+            	
             	if ( key == GLFW_KEY_N && action == GLFW_PRESS )
             		showNormals = !showNormals;
             	if ( key == GLFW_KEY_T && action == GLFW_PRESS ){
@@ -252,6 +261,16 @@ public class Game {
 		GameUtils.hearts[i] = new Heart(hPos);
 		hPos.x += 0.125;
 	}
+	
+	hPos.x +=.5;
+	
+	for (int i=0;i<10;i++){
+		GameUtils.lvlGui[i] = new Skull(hPos);
+		hPos.x +=0.125;
+	}
+	
+	GameUtils.setLevel(1);
+	GameUtils.setLives(3);
 	
 	
 	// Initialize Sound Board
@@ -454,6 +473,7 @@ public class Game {
             paddleBack.draw(pId);
             paddleFront.draw(pId);
             GameUtils.drawHearts(pId);
+            GameUtils.drawLevel(pId);
             //===============ENDE=========================
     	    glfwSwapBuffers(window);
             glfwPollEvents();
