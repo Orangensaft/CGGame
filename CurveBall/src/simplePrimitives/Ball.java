@@ -63,32 +63,33 @@ public class Ball {
 		//Kollisionsabfrage
 		Sides col = checkCols();
 		if (col == Sides.left || col==Sides.right){
-			//GameUtils.requestSound(SoundType.WallCol);
-			GameUtils.sndHit.play();
+			GameUtils.requestSound(SoundType.WallCol);
+			//GameUtils.sndHit.play();
 			direction.x = -direction.x;
 			spin.x = -spin.x;
 			pos.x = col == Sides.left ? GameUtils.left + r : GameUtils.right - r;
 		}
 		if (col == Sides.top || col == Sides.bottom){
-			//GameUtils.requestSound(SoundType.WallCol);
-			GameUtils.sndHit.play();
+			GameUtils.requestSound(SoundType.WallCol);
+			//GameUtils.sndHit.play();
 			direction.y = -direction.y;
 			spin.y = - spin.y;
 			pos.y = col == Sides.top ? GameUtils.top - r : GameUtils.bottom + r; 
 		}
 		if (hitsPaddles(a,b)){
-			//GameUtils.requestSound(SoundType.PaddleCol);
-			GameUtils.sndHit.play();
+			GameUtils.requestSound(SoundType.PaddleCol);
+			//GameUtils.sndHit.play();
 			direction.z = -direction.z;
 
 		}
 		
-		//Testen ob Ball Spielfeld verlässt
+		//Testen ob Ball Spielfeld verlï¿½sst
 		if(Math.abs(pos.z) > Math.abs(GameUtils.far)){
-			GameUtils.sndPoint.play();
+			//GameUtils.sndPoint.play();
+			GameUtils.requestSound(SoundType.Point);
 			//TODO:
-			//Spiel zurück setzen
-			//Eventuell Bot stärker machen
+			//Spiel zurï¿½ck setzen
+			//Eventuell Bot stï¿½rker machen
 		}
 		
 	}

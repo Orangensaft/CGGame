@@ -1,6 +1,7 @@
 package simplePrimitives;
 
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -9,6 +10,7 @@ import java.util.Random;
 
 import kuusisto.tinysound.Music;
 import kuusisto.tinysound.Sound;
+import kuusisto.tinysound.TinySound;
 
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
@@ -40,23 +42,21 @@ public abstract class GameUtils {
 	public static float bottom=1f;
 	public static float top=-1f;
 	public static float fps;
+	public static double time;
+	public static double last_sound = 0;
 	public static Audio waveEffect;
 
-	public static enum SoundType {PaddleCol, WallCol, dummy};
+	public static enum SoundType {PaddleCol, WallCol, Point, dummy};
 	private static int types = SoundType.values().length;
-	public static Audio[] SoundBoard;
+	public static Sound[] SoundBoard;
 	public static SoundType[] SoundContext;
 	public static int[] SoundTypeCounts;
-	public static Audio Request;
-	public static Audio Playing;
-	public static boolean played;
+	public static AudioThread Playing;
+	public static boolean active;
 	public static Random rand = new Random();
 	
 	//TinySound, Soundfiles
 	public static Music bg;
-	public static Sound sndHit;
-	public static Sound sndPoint;
-	
 	
 	public static float mousetoWorld(double mousePos,int max){
 		return (float) ((mousePos*1f/(max/2f))-1);
@@ -136,7 +136,7 @@ public abstract class GameUtils {
 	 public static int initSoundBoard(String[] src, SoundType[] context ) {
 		assert(src.length == context.length) : "Need one context per sound";
 		SoundTypeCounts = new int[types]; // Count how many Sounds for each Context exist
-		SoundBoard = new Audio[context.length];
+		SoundBoard = new Sound[context.length];
 		SoundContext = new SoundType[context.length];
 		// init Contexts to dummy
 		for (int i=0; i < context.length; i++) {
@@ -146,7 +146,7 @@ public abstract class GameUtils {
 		int n = 0;
 		for (int i=0; i < context.length; i++) {
 			try {
-				SoundBoard[n] = AudioLoader.getAudio("WAV", ResourceLoader.getResourceAsStream("assets/"+src[i]));
+				SoundBoard[n] = TinySound.loadSound(new File("assets/"+src[i]));
 				SoundContext[n] = context[i];
 				SoundTypeCounts[context[i].ordinal()]++;
 				SoundTypeCounts[context.length - 1]--;
@@ -168,11 +168,16 @@ public abstract class GameUtils {
 		while (n < SoundContext.length) {
 			if (SoundContext[n] == stype) {
 				if (i == rint) {
-					Request = SoundBoard[n];
-					break;
+					if (Playing != null) {
+						Playing.end();
+					}	
+					Playing = new AudioThread(SoundBoard[n]);
+					Playing.run();
+					last_sound = time;
 				}
 				i++;
 			}
+			n++;
 		}
 	}
 }

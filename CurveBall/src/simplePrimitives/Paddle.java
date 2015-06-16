@@ -12,6 +12,7 @@ import org.lwjgl.opengl.GL30;
 
 import mat.Vec3;
 import simplePrimitives.GameUtils;
+import simplePrimitives.GameUtils.SoundType;
 /**
  * Klasse f�r die Schl�ger
  * @author Nicolas

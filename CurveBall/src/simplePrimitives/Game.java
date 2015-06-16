@@ -20,10 +20,6 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.Sys;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
-import org.lwjgl.openal.*;
-import org.newdawn.slick.openal.AudioLoader;
-import org.newdawn.slick.openal.SoundStore;
-import org.newdawn.slick.util.ResourceLoader;
 
 import simplePrimitives.GameUtils.Sides;
 import simplePrimitives.GameUtils.SoundType;
@@ -246,23 +242,15 @@ public class Game {
     TinySound.init();
     //Load Sounds
 	GameUtils.bg = TinySound.loadMusic(new File("assets/bg.wav"));
-	GameUtils.sndHit = TinySound.loadSound(new File("assets/can.wav"));
-	GameUtils.sndPoint = TinySound.loadSound(new File("assets/point.wav"));
 	//Make BGM loop
 	GameUtils.bg.setLoop(true);
 	GameUtils.bg.play(true);
 	
 	
 	// Initialize Sound Board
-	/*
-	String[] sounds = {"can.wav", "can.wav"};
-	SoundType[] context = {SoundType.PaddleCol, SoundType.WallCol};
-	GameUtils.initSoundBoard(sounds, context);
-        GameUtils.Request = null;
-	GameUtils.Playing = null;
-	GameUtils.played = false;
-	*/
-	
+	String[] sounds = {"can.wav", "can.wav", "point.wav"};
+	SoundType[] context = {SoundType.PaddleCol, SoundType.WallCol, SoundType.Point};
+	GameUtils.initSoundBoard(sounds, context);	
     }
     
     
@@ -395,20 +383,15 @@ public class Game {
     	Wall wallBot = new Wall(new Vec3(-1,-1,-1),Sides.bottom,2f,2f);
     	
     	double lastLoopTime = getTime();
-    	double time;
     	float delta;
     	float timeCount=0;
     	int fpsCount = 0;
-    	
+    	int count = 0;
         while ( glfwWindowShouldClose(window) == GL_FALSE ) {
-	    if (GameUtils.Playing != null && !GameUtils.played) {
-	    	GameUtils.Playing.playAsSoundEffect(1f, 1f, false);
-		GameUtils.played = true;
-	    }
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
-        	time = getTime();
-        	delta = (float) (time-lastLoopTime);
-        	lastLoopTime=time;
+        	GameUtils.time = getTime();
+        	delta = (float) (GameUtils.time-lastLoopTime);
+        	lastLoopTime=GameUtils.time;
         	timeCount += delta;
         	fpsCount++;
         	if(timeCount > 1f){
@@ -416,7 +399,11 @@ public class Game {
         		fpsCount=0;
         		timeCount -=1f;
         	}
-        	System.out.println(GameUtils.fps);
+        	count++;
+        	if (count % 240 == 0) {
+            	System.out.println(count);
+        		GameUtils.requestSound(GameUtils.SoundType.PaddleCol);
+        	}
             //matrix inits etc.
             modelMatrix = new TranslationMatrix(new Vec3(0,0,1));  // translate...
             modelMatrix = (Matrix4) new RotationMatrix(modelAngle.y, mat.Axis.Y).mul(modelMatrix); // ... and rotate, multiply matrices 
@@ -464,15 +451,6 @@ public class Game {
             glfwPollEvents();
 	    // Poll to allow streaming queues
         
-            /*
-	    SoundStore.get().poll(0);
-	    if (GameUtils.Request != null) {
-	        GameUtils.Playing = GameUtils.Request;
-	        GameUtils.played = false;
-	        GameUtils.Request = null;
-	    }
-	    */
-	    
         }
         GameUtils.bg.stop();
         TinySound.shutdown();
