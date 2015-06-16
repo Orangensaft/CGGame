@@ -6,11 +6,13 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.Random;
 
 import kuusisto.tinysound.Music;
 import kuusisto.tinysound.Sound;
 import kuusisto.tinysound.TinySound;
+import mat.Vec3;
 
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
@@ -44,6 +46,15 @@ public abstract class GameUtils {
 	public static float fps;
 	public static double time;
 	public static double last_sound = 0;
+	
+	private static int lives=3;
+	private static int lvl=1;
+	public static Heart[] hearts = new Heart[3];
+	public static Vec3 skullPos = new Vec3(0f,1.2,1f);
+	public static Skull[] lvlGui = new Skull[10];
+	
+	public static boolean isPaused=true;
+	
 	public static Audio waveEffect;
 
 	public static enum SoundType {PaddleCol, WallCol, Point, dummy};
@@ -62,7 +73,49 @@ public abstract class GameUtils {
 		return (float) ((mousePos*1f/(max/2f))-1);
 	}
 	
+	public static void setLives(int n){
+		lives=n;
+		for (int i=0;i<3;i++){
+			hearts[i].setVisible(false);
+		}
+		for (int i=0;i<n;i++){
+			hearts[i].setVisible(true);
+		}	
+		System.out.println("Updated lives to "+n);
+	}
 	
+	public static void drawHearts(int pId){
+		for (int i=0;i<3;i++){
+			hearts[i].draw(pId);
+		}
+	}
+	
+	
+	public static int getLives(){
+		return lives;
+	}
+	
+	public static void setLevel(int n){
+		lvl = n;
+		for (int i=0;i<10;i++){
+			lvlGui[i].setVisible(false);
+		}
+		for(int i=0;i<n;i++){
+			lvlGui[i].setVisible(true);
+		}
+		System.out.println("Updates LVL to "+n);
+		
+	}
+	
+	public static int getLevel(){
+		return lvl;
+	}
+	
+	public static void drawLevel(int pId){
+		for (int i=0;i<10;i++){
+			lvlGui[i].draw(pId);
+		}
+	}
 	
 	
 	

@@ -81,7 +81,7 @@ public class Game {
     private Matrix4 viewMatrix = null;
     private Matrix4 modelMatrix = null;
     private Vec3 modelAngle = new Vec3(0,0,0);
-    private Vec3 cameraPos = new Vec3(0,0,-3); //Kamera-Position
+    private Vec3 cameraPos = new Vec3(0,0,-3.3f); //Kamera-Position
     private float deltaRot = 2.5f;
     
     // toggles & interactions
@@ -159,6 +159,15 @@ public class Game {
             		modelAngle.y = 0;
             	}
             	
+            	if (key == GLFW_KEY_Q && action == GLFW_PRESS){
+            		GameUtils.setLives((GameUtils.getLives()+1)%4);
+            	}
+            	
+            	if (key == GLFW_KEY_E && action == GLFW_PRESS){
+            		GameUtils.setLevel((GameUtils.getLevel()+1)%11);
+            	}
+            	
+            	
             	if ( key == GLFW_KEY_N && action == GLFW_PRESS )
             		showNormals = !showNormals;
             	if ( key == GLFW_KEY_T && action == GLFW_PRESS ){
@@ -225,7 +234,7 @@ public class Game {
         GL11.glViewport(0, 0, WIDTH, HEIGHT);
         
         // Set the clear color - gray
-        glClearColor(0.3f, 0.3f, 0.3f, 0.0f);
+        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         
         // Switch to wireframe
         glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
@@ -245,6 +254,23 @@ public class Game {
 	//Make BGM loop
 	GameUtils.bg.setLoop(true);
 	GameUtils.bg.play(true);
+	
+	Vec3 hPos = new Vec3(-1.2,1.2,1);
+	System.out.println("INIT");
+	for (int i=0;i<3;i++){
+		GameUtils.hearts[i] = new Heart(hPos);
+		hPos.x += 0.125;
+	}
+	
+	hPos.x +=.5;
+	
+	for (int i=0;i<10;i++){
+		GameUtils.lvlGui[i] = new Skull(hPos);
+		hPos.x +=0.125;
+	}
+	
+	GameUtils.setLevel(1);
+	GameUtils.setLives(3);
 	
 	
 	// Initialize Sound Board
@@ -446,6 +472,8 @@ public class Game {
             wallBot.draw(pId);
             paddleBack.draw(pId);
             paddleFront.draw(pId);
+            GameUtils.drawHearts(pId);
+            GameUtils.drawLevel(pId);
             //===============ENDE=========================
     	    glfwSwapBuffers(window);
             glfwPollEvents();
