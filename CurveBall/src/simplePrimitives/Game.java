@@ -17,9 +17,12 @@ import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
 import org.lwjgl.openal.*;
 import org.newdawn.slick.openal.AudioLoader;
+import org.newdawn.slick.openal.SoundStore;
 import org.newdawn.slick.util.ResourceLoader;
 
 import simplePrimitives.GameUtils.Sides;
+import simplePrimitives.GameUtils.SoundType;
+
 import de.matthiasmann.twl.utils.PNGDecoder;
 import de.matthiasmann.twl.utils.PNGDecoder.Format;
 
@@ -173,6 +176,8 @@ public class Game {
             	}
             	
             }
+
+
         });
    
         // Get the resolution of the primary monitor
@@ -228,16 +233,13 @@ public class Game {
         // Draw thicker lines
         GL11.glLineWidth(2);
         
-        
-        //SOUNDS LADEN
-        try {
-        	GameUtils.waveEffect = AudioLoader.getAudio("WAV", ResourceLoader.getResourceAsStream("assets/can.wav"));
-        }catch(Exception ex){
-        	
-        }
-        
-        
-        
+	// Initialize Sound Board
+	String[] sounds = {"can.wav", "can.wav"};
+	SoundType[] context = {SoundType.paddleCol, SoundType.WallCol};
+	GameUtils.initSoundBoard(sounds, context);
+        GameUtils.Request = null;
+	GameUtils.Playing = null;
+	GameUtils.played = false;
     }
     
     
@@ -376,6 +378,10 @@ public class Game {
     	int fpsCount = 0;
     	
         while ( glfwWindowShouldClose(window) == GL_FALSE ) {
+	    if (GameUtils.Playing != null && !GameUtils.played) {
+	    	GameUtils.Playing.playAsSoundEffect(1f, 1f, false);
+		GameUtils.played = true;
+	    }
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
         	time = getTime();
         	delta = (float) (time-lastLoopTime);
@@ -419,7 +425,7 @@ public class Game {
             // ================================== Draw objects =================================
             /*Hier die Objekte von hinten nach vorne zeichen
             *-> Painters-Algo
-            *Wände
+            *WÃ¤nde
             *Hinteres Paddle
             *Kugel
             *Vorderes Paddle
@@ -431,8 +437,15 @@ public class Game {
             paddleBack.draw(pId);
             paddleFront.draw(pId);
             //===============ENDE=========================
-    		glfwSwapBuffers(window);
+    	    glfwSwapBuffers(window);
             glfwPollEvents();
+	    // Poll to allow streaming queues
+	    SoundStore.get().poll(0);
+	    if (GameUtils.Request != null) {
+	        GameUtils.Playing = GameUtils.Request;
+	        GameUtils.played = false;
+	        GameUtils.Request = null;
+	    }
         }
         //AL.destroy();
     }

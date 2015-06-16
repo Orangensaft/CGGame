@@ -1,6 +1,8 @@
 package simplePrimitives;
 
 import simplePrimitives.GameUtils.Sides;
+import simplePrimitives.GameUtils.SoundType;
+
 import mat.Axis;
 import mat.Vec3;
 
@@ -17,7 +19,8 @@ public class Ball {
 	private Vec3 pos; //Position
 	private Vec3 spin; // Drehung
 	private Vec3 spinStep; // Drehung inkrement
-	private float rotX, rotY; // Müssen X und Y rotiert werden?
+	private float rotX;
+	private float rotY; // Müssen X und Y rotiert werden?
 	private float r=1f/16f; //Radius des Balls
 	/**
 	 * Ball erstellen
@@ -40,14 +43,14 @@ public class Ball {
 		if (Math.abs(spin.x) > spinStep.x){
 			rotX += Math.signum(spin.x)*spinStep.x;
 			rotX %= 2*Math.PI;
-			pos.x += Math.signum(spin.x)*spinStep.x;
+			pos.x += spin.x;
 			spin.x -= Math.signum(spin.x)*spinStep.x;
 		}
-		pos.y += direction.y;  		
+		pos.y += direction.y; 
 		if (Math.abs(spin.y) > spinStep.y){
 			rotY += Math.signum(spin.y)*spinStep.y;
 			rotY %= 2*Math.PI;
-			pos.y += Math.signum(spin.y)*spinStep.y;
+			pos.y += spin.y;
 			spin.y -= Math.signum(spin.y)*spinStep.y;
 		}
 		updateDirections(a,b);
@@ -60,23 +63,26 @@ public class Ball {
 		//Kollisionsabfrage
 		Sides col = checkCols();
 		if (col == Sides.left || col==Sides.right){
+			GameUtils.requestSound(SoundType.WallCol);
 			direction.x = -direction.x;
 			spin.x = -spin.x;
 			pos.x = col == Sides.left ? GameUtils.left + r : GameUtils.right - r;
 		}
 		if (col == Sides.top || col == Sides.bottom){
+			GameUtils.requestSound(SoundType.WallCol);
 			direction.y = -direction.y;
 			spin.y = - spin.y;
 			pos.y = col == Sides.top ? GameUtils.top - r : GameUtils.bottom + r; 
 		}
 		if (hitsPaddles(a,b)){
+			GameUtils.requestSound(SoundType.PaddleCol);
 			direction.z = -direction.z;
 
 		}
 	}
 	
 	/**
-	 * Testen ob Ball Wände berährt
+	 * Testen ob Ball Wände berührt
 	 */
 	private Sides checkCols(){
 		if (pos.x - r <= GameUtils.left)
@@ -113,7 +119,7 @@ public class Ball {
 			//passt y?
 			if(pos.y >= posA.y-sizeA[1]/2f && pos.y<=posA.y+sizeA[1]/2f){
 				//passt z -> Liegt Schläger im Radius der Kugel 
-				if(posA.z >= pos.z-r && posA.z<=pos.z+r){
+				if(posA.z >= pos.z - r && posA.z<=pos.z + r){
 					// setze spin zu slope
 					Vec3 tmp = a.getSlope();
 					spin.x += tmp.x;
@@ -121,8 +127,6 @@ public class Ball {
 					spinStep.x = Math.abs(spin.x/100d);
 					spinStep.y = Math.abs(spin.y/100d);
 					return true;
-					
-					
 				}
 			}
 		}
