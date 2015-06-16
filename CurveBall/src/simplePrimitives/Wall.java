@@ -41,7 +41,7 @@ public class Wall {
 	 * Ursprung unten links
 	 * @param pos Ausgangspunkt
 	 * @param width Breite (Wenn 0 -> Hochkant)
-	 * @param height Höhe (Wenn 0 -> Horizontal)
+	 * @param height Hï¿½he (Wenn 0 -> Horizontal)
 	 * @param depth Tiefe  
 	 */
 	public Wall(Vec3 pos, Sides side, float width, float depth){
@@ -56,7 +56,9 @@ public class Wall {
 			size[2]=depth;
 		}
 		this.pos=pos;
-		//textureId = GameUtils.loadPNGTexture(tex, GL13.GL_TEXTURE0);
+        // Bind to the VAO that has all the information about the vertices
+		textureId = GameUtils.loadPNGTexture(tex, GL13.GL_TEXTURE0);
+		
 		updateGraphics();
 	}
 	private void updateGraphics() {
@@ -253,9 +255,10 @@ public class Wall {
 	public void draw(int pId){
 		//Paddle zeichen
 		GL20.glUseProgram(pId);
-        // Bind to the VAO that has all the information about the vertices
-		textureId = GameUtils.loadPNGTexture(tex, GL13.GL_TEXTURE0);
         GL30.glBindVertexArray(vaoId);
+        // Bind the texture
+		GL13.glActiveTexture(GL13.GL_TEXTURE0);
+		GL11.glBindTexture(GL11.GL_TEXTURE_2D, textureId);
         GL20.glEnableVertexAttribArray(0);
         GL20.glEnableVertexAttribArray(1);
         GL20.glEnableVertexAttribArray(2);

@@ -5,12 +5,15 @@ import simplePrimitives.GameUtils.SoundType;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
+
 import mat.Axis;
 import mat.Vec3;
 import mat.VectorHelper;
+
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
@@ -29,7 +32,7 @@ public class Ball {
 	private Vec3 spinStep; // Drehung inkrement
 	private float rotX;
 	private float rotY; // Müssen X und Y rotiert werden?
-	private float r=1f/16f; //Radius des Balls
+	public static float r=1f/16f; //Radius des Balls
 	public int vaoId;
 	public int vboId;
 	public int vbocId;
@@ -40,6 +43,8 @@ public class Ball {
 	public int vbonlId;
 	public int vbonlcId;
 	public int textureID;
+	private String tex;
+	private int indicesCount;
 	/**
 	 * Ball erstellen
 	 * @param pos ZENTRUM des Balls
@@ -51,6 +56,9 @@ public class Ball {
 		this.direction = new Vec3(0,0,0);
 		rotX = 0;
 		rotY = 0;
+		tex = "assets/heart.png";
+        // Bind to the VAO that has all the information about the vertices
+		textureID = GameUtils.loadPNGTexture(tex, GL13.GL_TEXTURE0);
 	}
 	
 	/**
@@ -72,6 +80,7 @@ public class Ball {
 			spin.y -= Math.signum(spin.y)*spinStep.y;
 		}
 		updateDirections(a,b);
+		updateGraphics();
 	}
 	
 	/**
@@ -81,6 +90,7 @@ public class Ball {
 		//Kollisionsabfrage
 		Sides col = checkCols();
 		if (col == Sides.left || col==Sides.right){
+			System.out.println("collided with side");
 			GameUtils.requestSound(SoundType.WallCol);
 			//GameUtils.sndHit.play();
 			direction.x = -direction.x;
@@ -88,13 +98,20 @@ public class Ball {
 			pos.x = col == Sides.left ? GameUtils.left + r : GameUtils.right - r;
 		}
 		if (col == Sides.top || col == Sides.bottom){
+
+			System.out.println("collided with floor / ceiling");
+			System.out.printf("pos:(%f, %f, %f); dir:(%f, %f, %f), spin:(%f, %f)\n", pos.x, pos.y, pos.z, 
+					direction.x, direction.y, direction.z,
+					spin.x,
+					spin.y);
 			GameUtils.requestSound(SoundType.WallCol);
 			//GameUtils.sndHit.play();
 			direction.y = -direction.y;
 			spin.y = - spin.y;
-			pos.y = col == Sides.top ? GameUtils.top - r : GameUtils.bottom + r; 
+			pos.y = col == Sides.top ? GameUtils.top + r : GameUtils.bottom - r; 
 		}
 		if (hitsPaddles(a,b)){
+			System.out.println("collided with paddle");
 			GameUtils.requestSound(SoundType.PaddleCol);
 			//GameUtils.sndHit.play();
 			direction.z = -direction.z;
@@ -120,9 +137,9 @@ public class Ball {
 				return Sides.left;
 		if (pos.x + r >= GameUtils.right)
 				return Sides.right;
-		if (pos.y + r >= GameUtils.top)
+		if (pos.y - r <= GameUtils.top)
 				return Sides.top;
-		if (pos.y - r <= GameUtils.bottom)
+		if (pos.y + r >= GameUtils.bottom)
 				return Sides.bottom;
 		return Sides.none;
 	}
@@ -167,9 +184,9 @@ public class Ball {
 	/**
 	 * Ball Zeichen
 	 */
-	public void draw(int pID){
-		int x = 50;
-		int y = 50;
+	public void updateGraphics(){
+		int x = 5;
+		int y = 5;
 		float vertices[] = new float[x*y*3 + 2*3];
 		float normals[] = new float[x*y*3 + 2*3];
 		float texture[] = new float[x*y*2 + 4];
@@ -204,21 +221,18 @@ public class Ball {
 				// so we can always connect the first vector of a slice with the upper pole
 				vc = -Math.PI + vangle * (stack + 1) + rotX; // cos(-pi) = 1
 				hc = -Math.PI + hangle * slice + rotY; // cos(-pi) = 1
-				vertices[vp] = (float) (-r * Math.sin(vc) * Math.cos(hc));
-				vertices[vp + 1] = (float) (-r * Math.cos(vc));
-				vertices[vp + 2] = (float) (-r * Math.sin(vc) * Math.sin(hc));
+				normals[vp] = (float) (Math.sin(vc) * Math.cos(hc));
+				normals[vp + 1] = (float) (Math.cos(vc));
+				normals[vp + 2] = (float) (Math.sin(vc) * Math.sin(hc));
 
+				vertices[vp] = normals[vp] * -r;
+				vertices[vp + 1] = normals[vp + 1] * -r;
+				vertices[vp + 2] = normals[vp + 2] * -r;
+				
 				vertices[vp] += pos.x;
 				vertices[vp + 1] += pos.y;
 				vertices[vp + 2] += pos.z;
 
-				// normal vector is the normalized vector between circle center and vertex
-				Vec3 normal = new Vec3(vertices[vp], vertices[vp + 1], vertices[vp + 2]);
-				normal = normal.sub(pos);
-				normal = VecCalc.normalize(normal);
-				normals[vp] = (float) normal.x;
-				normals[vp + 1] = (float) normal.y;
-				normals[vp + 2] = (float) normal.z;
 				vp += 3;
 				// add color to every vertex
 			}
@@ -263,13 +277,10 @@ public class Ball {
 		normalsBuffer.put(normals);
 		normalsBuffer.flip();
 		
-		FloatBuffer colorsBuffer = BufferUtils.createFloatBuffer(colors.length);
-		colorsBuffer.put(colors);
-		colorsBuffer.flip();
-		
 		IntBuffer indicesBuffer = BufferUtils.createIntBuffer(indices.length);
 		indicesBuffer.put(indices);
 		indicesBuffer.flip();
+		indicesCount = indices.length;
 		
 		// normal lines. Each line is represented by its start "vertex" and and "vertex + normalScale*normal"
 		float[] normalLines = new float[vertices.length*2];
@@ -294,97 +305,125 @@ public class Ball {
 		float[] normalLinesColors = new float[colors.length*2];
 		
 		pos=0;
+		int cpos=0;
 		for (int i=0; i < colors.length; i+=4){
-			colors[pos]=1f;
+			colors[cpos++]=1f;
 			normalLinesColors[pos++]=1f;
-			colors[pos]=1f;
+			colors[cpos++]=1f;
 			normalLinesColors[pos++]=1f;
-			colors[pos]=0f;
+			colors[cpos++]=1f;
 			normalLinesColors[pos++]=0f;
-			colors[pos]=1f;
+			colors[cpos++]=1f;
 			normalLinesColors[pos++]=1f;
-			colors[pos]=1f;
 			normalLinesColors[pos++]=1f;
-			colors[pos]=1f;
 			normalLinesColors[pos++]=1f;
-			colors[pos]=0f;
 			normalLinesColors[pos++]=0f;
-			colors[pos]=1f;
 			normalLinesColors[pos++]=1f;
 		}		
 		FloatBuffer normalLinesColorsBuffer = BufferUtils.createFloatBuffer(normalLinesColors.length);
 		normalLinesColorsBuffer.put(normalLinesColors);
 		normalLinesColorsBuffer.flip();
 
+
+		FloatBuffer colorsBuffer = BufferUtils.createFloatBuffer(colors.length);
+		colorsBuffer.put(colors);
+		colorsBuffer.flip();
+		
 		//Daten in Graka werfen
-		// Create a new Vertex Array Object in memory and select it (bind)
-		// A VAO can have up to 16 attributes (VBO's) assigned to it by default
-		vaoId = GL30.glGenVertexArrays();
-		GL30.glBindVertexArray(vaoId);
-		
-		// Create a new Vertex Buffer Object (VBO) in memory and select it (bind)
-		// A VBO is a collection of Vectors which in this case resemble the location of each vertex.
-		vboId = GL15.glGenBuffers();
-		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vboId);
-		GL15.glBufferData(GL15.GL_ARRAY_BUFFER, verticesBuffer, GL15.GL_STATIC_DRAW);
-		// Put the VBO in the attributes list at index 0
-		GL20.glVertexAttribPointer(0, 3, GL11.GL_FLOAT, false, 0, 0);
-		// Deselect (bind to 0) the VBO
-		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
-		
-		// Create a new VBO for the indices and select it (bind) - COLORS
-		vbocId = GL15.glGenBuffers();
-		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vbocId);
-		GL15.glBufferData(GL15.GL_ARRAY_BUFFER, colorsBuffer, GL15.GL_STATIC_DRAW);
-		//index 1, in 0 are the vertices stored; 4 values (RGAB) instead of 3 (XYZ)
-		GL20.glVertexAttribPointer(1, 4, GL11.GL_FLOAT, false, 0, 0); 
-		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
-		
-		// Create a new VBO for the indices and select it (bind) - NORMALS
-		vbonId = GL15.glGenBuffers();
-		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vbonId);
-		GL15.glBufferData(GL15.GL_ARRAY_BUFFER, normalsBuffer, GL15.GL_STATIC_DRAW);
-		//index 2, 3 values (XYZ)
-		GL20.glVertexAttribPointer(2, 3, GL11.GL_FLOAT, true, 0, 0); 
-		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
-		
-		// Create a new VBO and select it (bind) - TEXTURE COORDS
-		vbotId = GL15.glGenBuffers();
-		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vbotId);
-		GL15.glBufferData(GL15.GL_ARRAY_BUFFER, textureCoordsBuffer, GL15.GL_STATIC_DRAW);
-		//index 3, 2 values (ST)
-		GL20.glVertexAttribPointer(3, 2, GL11.GL_FLOAT, true, 0, 0); 
-		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
-		
-		// Create a new VBO for the indices and select it (bind) - INDICES
-		vboiId = GL15.glGenBuffers();
-		GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, vboiId);
-		GL15.glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, indicesBuffer, GL15.GL_STATIC_DRAW);
-		// Deselect (bind to 0) the VBO
-		GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0);
-		
-		// _Second_ VAO for normal visualization (optional)
-		vaoNormalLinesId = GL30.glGenVertexArrays();
-		GL30.glBindVertexArray(vaoNormalLinesId);
-		
-		// Create a new VBO for normal lines and select it (bind)
-		vbonlId = GL15.glGenBuffers();
-		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vbonlId);
-		GL15.glBufferData(GL15.GL_ARRAY_BUFFER, normalLinesBuffer, GL15.GL_STATIC_DRAW);
-		//index 0, new VAO; 3 values (XYZ)
-		GL20.glVertexAttribPointer(0, 3, GL11.GL_FLOAT, false, 0, 0); 
-		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
-		
-		// Create a new VBO for normal lines and select it (bind) - COLOR
-		vbonlcId = GL15.glGenBuffers();
-		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vbonlcId);
-		GL15.glBufferData(GL15.GL_ARRAY_BUFFER, normalLinesColorsBuffer, GL15.GL_STATIC_DRAW);
-		//index 0, new VAO; 4 values (RGBA)
-		GL20.glVertexAttribPointer(1, 4, GL11.GL_FLOAT, false, 0, 0); 
-		GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
-		
-		// Deselect (bind to 0) the VAO
-		GL30.glBindVertexArray(0);
+				// Create a new Vertex Array Object in memory and select it (bind)
+				// A VAO can have up to 16 attributes (VBO's) assigned to it by default
+				vaoId = GL30.glGenVertexArrays();
+				GL30.glBindVertexArray(vaoId);
+				
+				// Create a new Vertex Buffer Object (VBO) in memory and select it (bind)
+				// A VBO is a collection of Vectors which in this case resemble the location of each vertex.
+				vboId = GL15.glGenBuffers();
+				GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vboId);
+				GL15.glBufferData(GL15.GL_ARRAY_BUFFER, verticesBuffer, GL15.GL_STATIC_DRAW);
+				// Put the VBO in the attributes list at index 0
+				GL20.glVertexAttribPointer(0, 3, GL11.GL_FLOAT, false, 0, 0);
+				// Deselect (bind to 0) the VBO
+				GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
+				
+				// Create a new VBO for the indices and select it (bind) - COLORS
+		        vbocId = GL15.glGenBuffers();
+		        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vbocId);
+		        GL15.glBufferData(GL15.GL_ARRAY_BUFFER, colorsBuffer, GL15.GL_STATIC_DRAW);
+		        //index 1, in 0 are the vertices stored; 4 values (RGAB) instead of 3 (XYZ)
+		        GL20.glVertexAttribPointer(1, 4, GL11.GL_FLOAT, false, 0, 0); 
+		        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
+		        
+		        // Create a new VBO for the indices and select it (bind) - NORMALS
+		        vbonId = GL15.glGenBuffers();
+		        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vbonId);
+		        GL15.glBufferData(GL15.GL_ARRAY_BUFFER, normalsBuffer, GL15.GL_STATIC_DRAW);
+		        //index 2, 3 values (XYZ)
+		        GL20.glVertexAttribPointer(2, 3, GL11.GL_FLOAT, true, 0, 0); 
+		        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
+		        
+		        // Create a new VBO and select it (bind) - TEXTURE COORDS
+		        vbotId = GL15.glGenBuffers();
+		        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vbotId);
+		        GL15.glBufferData(GL15.GL_ARRAY_BUFFER, textureCoordsBuffer, GL15.GL_STATIC_DRAW);
+		        //index 3, 2 values (ST)
+		        GL20.glVertexAttribPointer(3, 2, GL11.GL_FLOAT, true, 0, 0); 
+		        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
+				
+				// Create a new VBO for the indices and select it (bind) - INDICES
+				vboiId = GL15.glGenBuffers();
+				GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, vboiId);
+				GL15.glBufferData(GL15.GL_ELEMENT_ARRAY_BUFFER, indicesBuffer, GL15.GL_STATIC_DRAW);
+				// Deselect (bind to 0) the VBO
+				GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0);
+				
+				// _Second_ VAO for normal visualization (optional)
+				vaoNormalLinesId = GL30.glGenVertexArrays();
+				GL30.glBindVertexArray(vaoNormalLinesId);
+				
+				// Create a new VBO for normal lines and select it (bind)
+		        vbonlId = GL15.glGenBuffers();
+		        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vbonlId);
+		        GL15.glBufferData(GL15.GL_ARRAY_BUFFER, normalLinesBuffer, GL15.GL_STATIC_DRAW);
+		        //index 0, new VAO; 3 values (XYZ)
+		        GL20.glVertexAttribPointer(0, 3, GL11.GL_FLOAT, false, 0, 0); 
+		        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
+		        
+		        // Create a new VBO for normal lines and select it (bind) - COLOR
+		        vbonlcId = GL15.glGenBuffers();
+		        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, vbonlcId);
+		        GL15.glBufferData(GL15.GL_ARRAY_BUFFER, normalLinesColorsBuffer, GL15.GL_STATIC_DRAW);
+		        //index 0, new VAO; 4 values (RGBA)
+		        GL20.glVertexAttribPointer(1, 4, GL11.GL_FLOAT, false, 0, 0); 
+		        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
+		        
+		        // Deselect (bind to 0) the VAO
+		     	GL30.glBindVertexArray(0);
+	}
+	
+	public void draw(int pId){
+		//Paddle zeichen
+		GL20.glUseProgram(pId);
+        // Bind to the VAO that has all the information about the vertices
+		// Bind the texture
+		GL13.glActiveTexture(GL13.GL_TEXTURE0);
+		GL11.glBindTexture(GL11.GL_TEXTURE_2D, textureID);
+        GL30.glBindVertexArray(vaoId);
+        GL20.glEnableVertexAttribArray(0);
+        GL20.glEnableVertexAttribArray(1);
+        GL20.glEnableVertexAttribArray(2);
+        GL20.glEnableVertexAttribArray(3); // texture coordinates
+        // Bind to the index VBO that has all the information about the order of the vertices
+        GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, vboiId);
+        // Draw the vertices
+        GL11.glDrawElements(GL11.GL_TRIANGLE_STRIP, indicesCount, GL11.GL_UNSIGNED_INT, 0);
+        // Put everything back to default (deselect)
+        GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0);
+        GL20.glDisableVertexAttribArray(0);
+        GL20.glDisableVertexAttribArray(1);
+        GL20.glDisableVertexAttribArray(2);
+        GL20.glDisableVertexAttribArray(3);
+        GL30.glBindVertexArray(0);
+        GL20.glUseProgram(0);
 	}
 	
 	public Vec3 getPos(){

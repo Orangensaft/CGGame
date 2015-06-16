@@ -14,7 +14,7 @@ import mat.Vec3;
 import simplePrimitives.GameUtils;
 import simplePrimitives.GameUtils.SoundType;
 /**
- * Klasse f�r die Schl�ger
+ * Klasse für die Schläger
  * @author Nicolas
  * @author Jan
  */
@@ -51,6 +51,7 @@ public class Paddle {
 		else
 			tex = "assets/paddleb.png";
 			//textureID = GameUtils.loadPNGTexture("assets/paddleb.png", GL13.GL_TEXTURE0);
+		textureID = GameUtils.loadPNGTexture(tex, GL13.GL_TEXTURE0);
 		updateGraphics();
 	}
 	
@@ -233,7 +234,9 @@ public class Paddle {
 		//Paddle zeichen
 		GL20.glUseProgram(pId);
         // Bind to the VAO that has all the information about the vertices
-		textureID = GameUtils.loadPNGTexture(tex, GL13.GL_TEXTURE0);
+		// Bind the texture
+		GL13.glActiveTexture(GL13.GL_TEXTURE0);
+		GL11.glBindTexture(GL11.GL_TEXTURE_2D, textureID);
         GL30.glBindVertexArray(vaoId);
         GL20.glEnableVertexAttribArray(0);
         GL20.glEnableVertexAttribArray(1);

@@ -14,7 +14,7 @@ import mat.Vec3;
 import simplePrimitives.GameUtils;
 import simplePrimitives.GameUtils.SoundType;
 /**
- * Klasse für Herzen
+ * Klasse fï¿½r Herzen
  * @author Nicolas
  * @author Jan
  */
@@ -46,6 +46,8 @@ public class Heart {
 	public Heart(Vec3 pos){
 		this.pos = pos;
 		tex = "assets/heart.png";
+	        // Bind to the VAO that has all the information about the vertices
+		textureID = GameUtils.loadPNGTexture(tex, GL13.GL_TEXTURE0);
 		updateGraphics();
 	}
 	
@@ -228,13 +230,16 @@ public class Heart {
 		if (visible){
 			//Paddle zeichen
 			GL20.glUseProgram(pId);
-	        // Bind to the VAO that has all the information about the vertices
-			textureID = GameUtils.loadPNGTexture(tex, GL13.GL_TEXTURE0);
+
 	        GL30.glBindVertexArray(vaoId);
 	        GL20.glEnableVertexAttribArray(0);
 	        GL20.glEnableVertexAttribArray(1);
 	        GL20.glEnableVertexAttribArray(2);
 	        GL20.glEnableVertexAttribArray(3); // texture coordinates
+
+			// Bind the texture
+			GL13.glActiveTexture(GL13.GL_TEXTURE0);
+			GL11.glBindTexture(GL11.GL_TEXTURE_2D, textureID);
 	        // Bind to the index VBO that has all the information about the order of the vertices
 	        GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, vboiId);
 	        // Draw the vertices

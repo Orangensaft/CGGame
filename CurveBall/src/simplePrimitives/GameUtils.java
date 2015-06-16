@@ -67,7 +67,7 @@ public abstract class GameUtils {
 	public static Random rand = new Random();
 	
 	//TinySound, Soundfiles
-	public static Music bg;
+	public static BGMusicThread bg;
 	
 	public static float mousetoWorld(double mousePos,int max){
 		return (float) ((mousePos*1f/(max/2f))-1);
@@ -195,20 +195,21 @@ public abstract class GameUtils {
 		for (int i=0; i < context.length; i++) {
 			SoundContext[i] = SoundType.dummy;
 		}
-		SoundTypeCounts[context.length - 1] = context.length;
+		SoundTypeCounts[types - 1] = context.length;
 		int n = 0;
 		for (int i=0; i < context.length; i++) {
 			try {
-				SoundBoard[n] = TinySound.loadSound(new File("assets/"+src[i]));
+				SoundBoard[n] = TinySound.loadSound(new File("assets/sounds/"+src[i]));
 				SoundContext[n] = context[i];
 				SoundTypeCounts[context[i].ordinal()]++;
-				SoundTypeCounts[context.length - 1]--;
+				SoundTypeCounts[types - 1]--;
 				n++;
 			}catch(Exception ex){
-				System.out.printf("Failed to load Audio Resource assets/%s", src[i]);
+				ex.printStackTrace();
+				System.out.printf("Failed to load Audio Resource assets/sounds/%s\n", src[i]);
 			}
 		}
-		return SoundTypeCounts[context.length - 1];
+		return SoundTypeCounts[types - 1];
 	}
 
 	/**
@@ -224,7 +225,7 @@ public abstract class GameUtils {
 					if (Playing != null) {
 						Playing.end();
 						Playing.interrupt();
-					}	
+					}
 					Playing = new AudioThread(SoundBoard[n]);
 					Playing.run();
 					last_sound = time;

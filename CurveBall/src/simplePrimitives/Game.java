@@ -68,7 +68,6 @@ public class Game {
     private int vsNormalsId = 0;
     private int fsNormalsId = 0;
     private int pNormalsId = 0;
-    private int textureID = 0; //Wo benutzen? -> im original unbenutzt
     
     // Moving variables
     private int projectionMatrixLocation = 0;
@@ -250,10 +249,8 @@ public class Game {
 	//Load TinySound
     TinySound.init();
     //Load Sounds
-	GameUtils.bg = TinySound.loadMusic(new File("assets/bg.wav"));
-	//Make BGM loop
-	GameUtils.bg.setLoop(true);
-	GameUtils.bg.play(true);
+    GameUtils.bg = new BGMusicThread(TinySound.loadMusic(new File("assets/bg.wav")));
+	GameUtils.bg.run();
 	
 	Vec3 hPos = new Vec3(-1.2,1.2,1);
 	System.out.println("INIT");
@@ -274,8 +271,12 @@ public class Game {
 	
 	
 	// Initialize Sound Board
-	String[] sounds = {"can.wav", "can.wav", "point.wav"};
-	SoundType[] context = {SoundType.PaddleCol, SoundType.WallCol, SoundType.Point};
+	String[] sounds = {"paddle1.wav", "paddle2.wav", "paddle3.wav", "paddle4.wav", "paddle5.wav", 
+			"sides1.wav", "sides2.wav", "sides3.wav", "sides4.wav", 
+			"KIPoint.wav", "KIPoint2.wav"};
+	SoundType[] context = {SoundType.PaddleCol, SoundType.PaddleCol, SoundType.PaddleCol, SoundType.PaddleCol, SoundType.PaddleCol, 
+			SoundType.WallCol, SoundType.WallCol, SoundType.WallCol, SoundType.WallCol, 
+			SoundType.Point, SoundType.Point};
 	GameUtils.initSoundBoard(sounds, context);	
     }
     
@@ -396,8 +397,6 @@ public class Game {
     }
     
     
-    
-    
     private void loop() throws Exception {
     	
     	Paddle paddleFront = new Paddle(new Vec3(.5,.5,1),false); //nach oben rechts verschoben
@@ -407,12 +406,12 @@ public class Game {
     	Wall wallLeft = new Wall(new Vec3(-1,-1,-1),Sides.left,2f,2f);
     	Wall wallTop = new Wall(new Vec3(-1,1,-1),Sides.top,2f,2f);
     	Wall wallBot = new Wall(new Vec3(-1,-1,-1),Sides.bottom,2f,2f);
-    	
+    	// Ball
+    	Ball ball = new Ball(new Vec3(0, 0, 1-2*Ball.r));
     	double lastLoopTime = getTime();
     	float delta;
     	float timeCount=0;
     	int fpsCount = 0;
-    	int count = 0;
         while ( glfwWindowShouldClose(window) == GL_FALSE ) {
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
         	GameUtils.time = getTime();
@@ -425,11 +424,7 @@ public class Game {
         		fpsCount=0;
         		timeCount -=1f;
         	}
-        	count++;
-        	if (count % 240 == 0) {
-            	System.out.println(count);
-        		GameUtils.requestSound(GameUtils.SoundType.PaddleCol);
-        	}
+        	System.out.println(GameUtils.fps);
             //matrix inits etc.
             modelMatrix = new TranslationMatrix(new Vec3(0,0,1));  // translate...
             modelMatrix = (Matrix4) new RotationMatrix(modelAngle.y, mat.Axis.Y).mul(modelMatrix); // ... and rotate, multiply matrices 
@@ -471,16 +466,16 @@ public class Game {
             wallRight.draw(pId);
             wallBot.draw(pId);
             paddleBack.draw(pId);
+		    ball.draw(pId);
             paddleFront.draw(pId);
             GameUtils.drawHearts(pId);
             GameUtils.drawLevel(pId);
             //===============ENDE=========================
     	    glfwSwapBuffers(window);
+            ball.update(paddleFront, paddleBack);
             glfwPollEvents();
-	    // Poll to allow streaming queues
-        
         }
-        GameUtils.bg.stop();
+        GameUtils.bg.interrupt();
         TinySound.shutdown();
         //AL.destroy();
     }
