@@ -12,9 +12,6 @@
 -Starten des Spiels
 -Reset
 -Pause
-============Spielanzeige===============2
--Punkte Anzeigen
--Leben
 =========BONUS=================5
 -(Sound)
 -(Flugbahn)
