@@ -82,6 +82,15 @@ public class Ball {
 			direction.z = -direction.z;
 
 		}
+		
+		//Testen ob Ball Spielfeld verlässt
+		if(Math.abs(pos.z) > Math.abs(GameUtils.far)){
+			GameUtils.sndPoint.play();
+			//TODO:
+			//Spiel zurück setzen
+			//Eventuell Bot stärker machen
+		}
+		
 	}
 	
 	/**
