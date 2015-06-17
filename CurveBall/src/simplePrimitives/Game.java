@@ -473,6 +473,7 @@ public class Game {
     
     private void startGame(){
     	System.out.println("StartGame!");
+    	ball.setDirection(new Vec3(0,0,-1d/GameUtils.fps) );
     	//Ball "Abschießen"
     	//--> Startdirection auf Kugel tun
     }
@@ -541,6 +542,7 @@ public class Game {
             *Kugel
             *Vorderes Paddle
             */
+            GameUtils.adjustAI();
             wallTop.draw(pId);
             wallLeft.draw(pId);
             wallRight.draw(pId);

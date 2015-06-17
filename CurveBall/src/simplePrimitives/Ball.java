@@ -32,7 +32,7 @@ public class Ball {
 	private Vec3 spinStep; // Drehung inkrement
 	private float rotX;
 	private float rotY; // Müssen X und Y rotiert werden?
-	public static float r=1f/16f; //Radius des Balls
+	public static float r=1f/12f; //Radius des Balls
 	public int vaoId;
 	public int vboId;
 	public int vbocId;
@@ -61,6 +61,9 @@ public class Ball {
 		textureID = GameUtils.loadPNGTexture(tex, GL13.GL_TEXTURE0);
 	}
 	
+	public void setDirection(Vec3 dir){
+		this.direction = dir;
+	}
 	/**
 	 * Nächste Position des Balls berechnen
 	 */
@@ -87,6 +90,7 @@ public class Ball {
 			pos.y += spin.y;
 			spin.y -= Math.signum(spin.y)*spinStep.y;
 		}
+		pos.z += direction.z;
 		updateDirections(a,b);
 		updateGraphics();
 	}
@@ -103,7 +107,7 @@ public class Ball {
 			//GameUtils.sndHit.play();
 			direction.x = -direction.x;
 			spin.x = -spin.x;
-			pos.x = col == Sides.left ? GameUtils.left + r : GameUtils.right - r;
+			pos.x = col == Sides.left ? GameUtils.left + r + 0.05d : GameUtils.right - r - 0.05d;
 		}
 		if (col == Sides.top || col == Sides.bottom){
 
@@ -116,7 +120,7 @@ public class Ball {
 			//GameUtils.sndHit.play();
 			direction.y = -direction.y;
 			spin.y = - spin.y;
-			pos.y = col == Sides.top ? GameUtils.top + r : GameUtils.bottom - r; 
+			pos.y = col == Sides.top ? GameUtils.top + r + 0.05d: GameUtils.bottom - r -0.05d; 
 		}
 		if (hitsPaddles(a,b)){
 			System.out.println("collided with paddle");
@@ -178,10 +182,13 @@ public class Ball {
 				if(posA.z >= pos.z - r && posA.z<=pos.z + r){
 					// setze spin zu slope
 					Vec3 tmp = a.getSlope();
-					spin.x += tmp.x;
-					spin.y += tmp.y;
+					spin.x += tmp.x*.3;
+					spin.y += tmp.y*.3;
 					spinStep.x = Math.abs(spin.x/100d);
 					spinStep.y = Math.abs(spin.y/100d);
+					double dst = posA.z - pos.z;
+					pos.z = posA.z - Math.signum(dst)*(r+0.05);
+					
 					return true;
 				}
 			}
@@ -193,8 +200,8 @@ public class Ball {
 	 * Ball Zeichen
 	 */
 	public void updateGraphics(){
-		int x = 5;
-		int y = 5;
+		int x = 20;
+		int y = 20;
 		float vertices[] = new float[x*y*3 + 2*3];
 		float normals[] = new float[x*y*3 + 2*3];
 		float texture[] = new float[x*y*2 + 4];

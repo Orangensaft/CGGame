@@ -60,7 +60,25 @@ public class Paddle {
 	 * @param b
 	 */
 	public void AI_Act(Ball b){
-		
+		// Get ball position
+		Vec3 target = b.getPos();
+		// Get x,y,z distance
+		Vec3 delta = target.sub(this.pos);
+		// move paddle if ball is not inside range;
+		if (Math.abs(delta.x) > this.size[0]/2f || Math.abs(delta.y) > this.size[1]/2f) {
+			// calculate distance amount (x,y)
+			double dst = Math.sqrt(delta.x * delta.x + delta.y * delta.y);
+			// correct values if they are too wide away for slow KI
+			if (dst > GameUtils.AIDeltaDist) {
+				delta.x = delta.x/dst*GameUtils.AIDeltaDist;
+				delta.y = delta.y/dst*GameUtils.AIDeltaDist;
+			}
+			// change paddle position
+			this.setPos(
+				(float) (this.pos.x + delta.x),
+				(float) (this.pos.y + delta.y)
+			);
+		}
 	}
 	
 	/**

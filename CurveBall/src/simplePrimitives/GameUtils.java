@@ -43,10 +43,11 @@ public abstract class GameUtils {
 	public static float right=1f;
 	public static float bottom=1f;
 	public static float top=-1f;
-	public static float fps;
+	// Start the game as if we had 60fps
+	public static float fps = 60;
 	public static double time;
 	public static double last_sound = 0;
-	
+	public static double AIDeltaDist = 0.1;
 	private static int lives=3;
 	private static int lvl=1;
 	public static Heart[] hearts = new Heart[3];
@@ -54,7 +55,6 @@ public abstract class GameUtils {
 	public static Skull[] lvlGui = new Skull[10];
 	
 	public static GameState state = GameState.BeforeStart;
-	
 	
 	//Game states
 	public static enum GameState {
@@ -82,6 +82,11 @@ public abstract class GameUtils {
 	//TinySound, Soundfiles
 	public static BGMusicThread bg;
 	
+	public static void adjustAI () {
+		// should get noticably harder each level;
+		// should not feel different on different fps;
+		AIDeltaDist = (0.5+.1d*lvl*lvl)/fps; 
+	}
 	public static float mousetoWorld(double mousePos,int max){
 		return (float) ((mousePos*1f/(max/2f))-1);
 	}
