@@ -56,6 +56,14 @@ public class Paddle {
 	}
 	
 	/**
+	 * Let the AI move the paddle towards the ball
+	 * @param b
+	 */
+	public void AI_Act(Ball b){
+		
+	}
+	
+	/**
 	 * Schl�ger berechnen
 	 */
 	private void updateGraphics(){

@@ -53,6 +53,7 @@ public abstract class GameUtils {
 	public static Vec3 skullPos = new Vec3(0f,1.2,1f);
 	public static Skull[] lvlGui = new Skull[10];
 	
+	
 	public static boolean isPaused=true;
 	
 	public static Audio waveEffect;

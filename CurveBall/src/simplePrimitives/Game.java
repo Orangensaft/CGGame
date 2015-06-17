@@ -92,6 +92,17 @@ public class Game {
     private int useTexture = 1;
     private int useTextureLocation = 0;
   	
+    //Game
+    Paddle paddleFront;
+    Paddle paddleBack;
+    Wall wallRight;
+    Wall wallLeft;
+    Wall wallTop;
+    Wall wallBot;
+    Ball ball;
+    
+    
+    
     public void run() {
         System.out.println("Hello LWJGL " + Sys.getVersion() + "!");
  
@@ -156,11 +167,17 @@ public class Game {
             	
             	if (key == GLFW_KEY_R && action == GLFW_PRESS){
             		modelAngle.y = 0;
+            		initGame();
             	}
             	
             	if (key == GLFW_KEY_Q && action == GLFW_PRESS){
             		GameUtils.setLives((GameUtils.getLives()+1)%4);
             	}
+            	
+            	if (key == GLFW_KEY_P && action == GLFW_PRESS){
+            		GameUtils.isPaused ^= true;
+            	}
+            	
             	
             	if (key == GLFW_KEY_E && action == GLFW_PRESS){
             		GameUtils.setLevel((GameUtils.getLevel()+1)%11);
@@ -266,8 +283,7 @@ public class Game {
 		hPos.x +=0.125;
 	}
 	
-	GameUtils.setLevel(1);
-	GameUtils.setLives(3);
+	
 	
 	
 	// Initialize Sound Board
@@ -397,17 +413,25 @@ public class Game {
     }
     
     
+    private void initGame(){
+    	paddleFront = new Paddle(new Vec3(.5,.5,1),false); //nach oben rechts verschoben
+    	paddleBack = new Paddle(new Vec3(0,0,-1),true);
+    	//Rechte Wand, beginnt vorne unten rechts, 2 Breit, 2 Tief
+    	wallRight = new Wall(new Vec3(1,-1,-1),Sides.right,2f,2f);
+    	wallLeft = new Wall(new Vec3(-1,-1,-1),Sides.left,2f,2f);
+    	wallTop = new Wall(new Vec3(-1,1,-1),Sides.top,2f,2f);
+    	wallBot = new Wall(new Vec3(-1,-1,-1),Sides.bottom,2f,2f);
+    	// Ball
+    	ball = new Ball(new Vec3(0, 0, 1-2*Ball.r));
+    	GameUtils.setLevel(1);
+    	GameUtils.setLives(3);
+    	GameUtils.isPaused = true;
+    }
+    
     private void loop() throws Exception {
     	
-    	Paddle paddleFront = new Paddle(new Vec3(.5,.5,1),false); //nach oben rechts verschoben
-    	Paddle paddleBack = new Paddle(new Vec3(0,0,-1),true);
-    	//Rechte Wand, beginnt vorne unten rechts, 2 Breit, 2 Tief
-    	Wall wallRight = new Wall(new Vec3(1,-1,-1),Sides.right,2f,2f);
-    	Wall wallLeft = new Wall(new Vec3(-1,-1,-1),Sides.left,2f,2f);
-    	Wall wallTop = new Wall(new Vec3(-1,1,-1),Sides.top,2f,2f);
-    	Wall wallBot = new Wall(new Vec3(-1,-1,-1),Sides.bottom,2f,2f);
-    	// Ball
-    	Ball ball = new Ball(new Vec3(0, 0, 1-2*Ball.r));
+    	initGame();
+    	
     	double lastLoopTime = getTime();
     	float delta;
     	float timeCount=0;
@@ -424,7 +448,7 @@ public class Game {
         		fpsCount=0;
         		timeCount -=1f;
         	}
-        	System.out.println(GameUtils.fps);
+        	System.out.println(GameUtils.fps+" Paused? "+GameUtils.isPaused);
             //matrix inits etc.
             modelMatrix = new TranslationMatrix(new Vec3(0,0,1));  // translate...
             modelMatrix = (Matrix4) new RotationMatrix(modelAngle.y, mat.Axis.Y).mul(modelMatrix); // ... and rotate, multiply matrices 
@@ -452,7 +476,11 @@ public class Game {
             //System.out.println("X:"+xpos+", Y:"+ypos+" => XW="+worldX+", YW:"+worldY);
             
             //==================================Objekte updaten=================================
-            paddleFront.setPos(worldX, worldY);
+            if (!GameUtils.isPaused){
+            	paddleFront.setPos(worldX, worldY);		//Eigener Schläger
+            	paddleBack.AI_Act(ball);
+            	ball.update(paddleFront, paddleBack);	//kugel
+            }
             // ================================== Draw objects =================================
             /*Hier die Objekte von hinten nach vorne zeichen
             *-> Painters-Algo
@@ -472,7 +500,6 @@ public class Game {
             GameUtils.drawLevel(pId);
             //===============ENDE=========================
     	    glfwSwapBuffers(window);
-            ball.update(paddleFront, paddleBack);
             glfwPollEvents();
         }
         GameUtils.bg.interrupt();
