@@ -56,7 +56,7 @@ public class Ball {
 		this.direction = new Vec3(0,0,0);
 		rotX = 0;
 		rotY = 0;
-		tex = "assets/heart.png";
+		tex = "assets/ball.png";
         // Bind to the VAO that has all the information about the vertices
 		textureID = GameUtils.loadPNGTexture(tex, GL13.GL_TEXTURE0);
 	}
