@@ -1,17 +1,11 @@
 ========Texturierte Levelobjekte==========6
--Kugel darstellen + Textur
-
+(BallTextur?)
 ===========Spiellogik============4
 -Spielstart ball richtung Gegner
 -Flugbahn/Winkel im Bezug zum Schläger
 -KI
--Gewinnen -> KI wird besser
+-Gewinnen -> KI wird besser (Paddle muss bezug auf lvl variable nehmen; dann passts)
 => (Ball Schneller / KI schneller / Schlägergröße)
--Extraleben
-=============Interaktion==============3
--Starten des Spiels
--Reset
--Pause
 =========BONUS=================5
 -(Sound)
 -(Flugbahn)
