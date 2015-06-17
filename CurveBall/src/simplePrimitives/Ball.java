@@ -65,6 +65,14 @@ public class Ball {
 	 * Nächste Position des Balls berechnen
 	 */
 	public void update(Paddle a, Paddle b){
+		if (pos.z > 1){ //Kugel bei Spieler im Aus
+			//Spiellogik ein Game.java ausgelagert
+			//GameUtils.setLives(GameUtils.getLives()-1);
+			GameUtils.state = GameUtils.GameState.PointPC;
+		}
+		if (pos.z < -1){//Kugel bei Gegner im Aus
+			GameUtils.state = GameUtils.GameState.PointPlayer;
+		}
 		pos.x += direction.x;
 		if (Math.abs(spin.x) > spinStep.x){
 			rotX += Math.signum(spin.x)*spinStep.x;

@@ -165,20 +165,39 @@ public class Game {
             		else glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
             	}
             	
+            	
+            	//Reset
             	if (key == GLFW_KEY_R && action == GLFW_PRESS){
             		modelAngle.y = 0;
             		initGame();
+            		GameUtils.state = GameUtils.GameState.BeforeStart;
             	}
             	
+            	
+            	//Leben hinzufügen
             	if (key == GLFW_KEY_Q && action == GLFW_PRESS){
             		GameUtils.setLives((GameUtils.getLives()+1)%4);
             	}
             	
+            	//Spiel pausieren
             	if (key == GLFW_KEY_P && action == GLFW_PRESS){
-            		GameUtils.isPaused ^= true;
+            		if (GameUtils.state == GameUtils.GameState.Running){
+            			GameUtils.state = GameUtils.GameState.Paused;
+            		}
+            		else if (GameUtils.state == GameUtils.GameState.Paused){
+            			GameUtils.state = GameUtils.GameState.Running;
+            		}
             	}
             	
+            	//Spiel starten, falls möglich
+            	if (key == GLFW_KEY_ENTER && action == GLFW_PRESS){
+            		if(GameUtils.state == GameUtils.GameState.BeforeStart){
+            			initGame();
+            			GameUtils.state = GameUtils.GameState.Running;
+            		}
+            	}
             	
+            	//level hinzufügen
             	if (key == GLFW_KEY_E && action == GLFW_PRESS){
             		GameUtils.setLevel((GameUtils.getLevel()+1)%11);
             	}
@@ -425,8 +444,27 @@ public class Game {
     	ball = new Ball(new Vec3(0, 0, 1-2*Ball.r));
     	GameUtils.setLevel(1);
     	GameUtils.setLives(3);
-    	GameUtils.isPaused = true;
     }
+    
+    /**
+     * Überprüft aktuelle Spielsituation und reagiert dementsprechent
+     */
+    private void checkState(){
+    	if (GameUtils.state == GameUtils.GameState.PointPC){
+    		GameUtils.setLives(GameUtils.getLives()-1); //Loose 1 live
+    	}
+    	if (GameUtils.state == GameUtils.GameState.PointPlayer){
+    		GameUtils.setLevel(GameUtils.getLevel()+1); // Level up!
+    		//Reset Ball position.
+    		ball = new Ball(new Vec3(0, 0, 1-2*Ball.r));
+    		GameUtils.state = GameUtils.state.BeforeStart;
+    	}
+		if (GameUtils.getLives()<1){ //Gameover
+			GameUtils.isLost = true;
+			GameUtils.state = GameUtils.state.BeforeStart;
+		}
+    }
+    
     
     private void loop() throws Exception {
     	
@@ -447,8 +485,9 @@ public class Game {
         		GameUtils.fps = fpsCount;
         		fpsCount=0;
         		timeCount -=1f;
+        		System.out.println(GameUtils.fps+" State? "+GameUtils.state);
         	}
-        	System.out.println(GameUtils.fps+" Paused? "+GameUtils.isPaused);
+        	
             //matrix inits etc.
             modelMatrix = new TranslationMatrix(new Vec3(0,0,1));  // translate...
             modelMatrix = (Matrix4) new RotationMatrix(modelAngle.y, mat.Axis.Y).mul(modelMatrix); // ... and rotate, multiply matrices 
@@ -476,11 +515,12 @@ public class Game {
             //System.out.println("X:"+xpos+", Y:"+ypos+" => XW="+worldX+", YW:"+worldY);
             
             //==================================Objekte updaten=================================
-            if (!GameUtils.isPaused){
+            if ((GameUtils.state == GameUtils.state.Running)){
             	paddleFront.setPos(worldX, worldY);		//Eigener Schläger
             	paddleBack.AI_Act(ball);
             	ball.update(paddleFront, paddleBack);	//kugel
             }
+            checkState();
             // ================================== Draw objects =================================
             /*Hier die Objekte von hinten nach vorne zeichen
             *-> Painters-Algo

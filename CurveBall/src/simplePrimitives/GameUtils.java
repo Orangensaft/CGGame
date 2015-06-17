@@ -53,8 +53,19 @@ public abstract class GameUtils {
 	public static Vec3 skullPos = new Vec3(0f,1.2,1f);
 	public static Skull[] lvlGui = new Skull[10];
 	
+	public static GameState state = GameState.BeforeStart;
 	
-	public static boolean isPaused=true;
+	
+	//Game states
+	public static enum GameState {
+		Running,	//Game running
+		PointPlayer,//Player scored point
+		PointPC,	//PC scored a point
+		BeforeStart, //Game has to be started
+		Paused		//Game was paused
+		};
+		
+	public static boolean isLost = false;
 	
 	public static Audio waveEffect;
 
