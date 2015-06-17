@@ -194,6 +194,11 @@ public class Game {
             		if(GameUtils.state == GameUtils.GameState.BeforeStart){
             			initGame();
             			GameUtils.state = GameUtils.GameState.Running;
+            			startGame();
+            		}
+            		if (GameUtils.state == GameUtils.GameState.AfterPoint){
+            			GameUtils.state = GameUtils.GameState.Running;
+            			startGame();
             		}
             	}
             	
@@ -452,17 +457,24 @@ public class Game {
     private void checkState(){
     	if (GameUtils.state == GameUtils.GameState.PointPC){
     		GameUtils.setLives(GameUtils.getLives()-1); //Loose 1 live
+    		GameUtils.state = GameUtils.state.AfterPoint;
     	}
     	if (GameUtils.state == GameUtils.GameState.PointPlayer){
     		GameUtils.setLevel(GameUtils.getLevel()+1); // Level up!
     		//Reset Ball position.
     		ball = new Ball(new Vec3(0, 0, 1-2*Ball.r));
-    		GameUtils.state = GameUtils.state.BeforeStart;
+    		GameUtils.state = GameUtils.state.AfterPoint;
     	}
 		if (GameUtils.getLives()<1){ //Gameover
 			GameUtils.isLost = true;
 			GameUtils.state = GameUtils.state.BeforeStart;
 		}
+    }
+    
+    private void startGame(){
+    	System.out.println("StartGame!");
+    	//Ball "Abschießen"
+    	//--> Startdirection auf Kugel tun
     }
     
     

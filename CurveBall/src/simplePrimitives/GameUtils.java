@@ -62,7 +62,8 @@ public abstract class GameUtils {
 		PointPlayer,//Player scored point
 		PointPC,	//PC scored a point
 		BeforeStart, //Game has to be started
-		Paused		//Game was paused
+		Paused,		//Game was paused
+		AfterPoint //After Point was scored
 		};
 		
 	public static boolean isLost = false;
