@@ -56,7 +56,7 @@ public class Ball {
 		this.direction = new Vec3(0,0,0);
 		rotX = 0;
 		rotY = 0;
-		tex = "assets/ball.png";
+		tex = "assets/wall.png";
         // Bind to the VAO that has all the information about the vertices
 		textureID = GameUtils.loadPNGTexture(tex, GL13.GL_TEXTURE0);
 	}
@@ -182,8 +182,8 @@ public class Ball {
 				if(posA.z >= pos.z - r && posA.z<=pos.z + r){
 					// setze spin zu slope
 					Vec3 tmp = a.getSlope();
-					spin.x += tmp.x*.3;
-					spin.y += tmp.y*.3;
+					spin.x += tmp.x*.05;
+					spin.y += tmp.y*.05;
 					spinStep.x = Math.abs(spin.x/100d);
 					spinStep.y = Math.abs(spin.y/100d);
 					double dst = posA.z - pos.z;
@@ -200,8 +200,8 @@ public class Ball {
 	 * Ball Zeichen
 	 */
 	public void updateGraphics(){
-		int x = 20;
-		int y = 20;
+		int x = 10;
+		int y = 10;
 		float vertices[] = new float[x*y*3 + 2*3];
 		float normals[] = new float[x*y*3 + 2*3];
 		float texture[] = new float[x*y*2 + 4];
@@ -443,6 +443,10 @@ public class Ball {
 	
 	public Vec3 getPos(){
 		return this.pos;
+	}
+	
+	public void setPos(Vec3 pos) {
+		this.pos = pos;
 	}
 	
 	public Vec3 getDirs(){

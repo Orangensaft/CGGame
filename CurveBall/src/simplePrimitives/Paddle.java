@@ -1,5 +1,6 @@
 package simplePrimitives;
 
+import java.io.IOException;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
@@ -13,6 +14,11 @@ import org.lwjgl.opengl.GL30;
 import mat.Vec3;
 import simplePrimitives.GameUtils;
 import simplePrimitives.GameUtils.SoundType;
+
+import org.newdawn.slick.Color;
+import org.newdawn.slick.opengl.Texture;
+import org.newdawn.slick.opengl.TextureLoader;
+import org.newdawn.slick.util.ResourceLoader;
 /**
  * Klasse für die Schläger
  * @author Nicolas
@@ -30,7 +36,7 @@ public class Paddle {
 	public int vaoNormalLinesId;
 	public int vbonlId;
 	public int vbonlcId;
-	public int textureID;
+	public int textureID = 0;
 
 	// slope variables for ball curve
 	private Vec3 slope;
@@ -52,6 +58,8 @@ public class Paddle {
 			tex = "assets/paddleb.png";
 			//textureID = GameUtils.loadPNGTexture("assets/paddleb.png", GL13.GL_TEXTURE0);
 		textureID = GameUtils.loadPNGTexture(tex, GL13.GL_TEXTURE0);
+		
+		
 		updateGraphics();
 	}
 	

@@ -135,9 +135,6 @@ public abstract class GameUtils {
 		}
 	}
 	
-	
-	
-	
 	 /**
      * Uses an external class to load a PNG image and bind it as texture
      * @param filename

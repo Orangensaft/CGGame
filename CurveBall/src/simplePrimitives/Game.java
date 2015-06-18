@@ -274,7 +274,7 @@ public class Game {
         GL11.glViewport(0, 0, WIDTH, HEIGHT);
         
         // Set the clear color - gray
-        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+        GL11.glClearColor(0.5f, 0.7f, 0.7f, 1.0f);
         
         // Switch to wireframe
         glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
@@ -283,7 +283,7 @@ public class Game {
         // Backface culling: Shows, if the triangles are correctly defined
         glDisable(GL_CULL_FACE);
         
-        // Draw thicker lines
+		// Draw thicker lines
         GL11.glLineWidth(2);
         
 	
@@ -482,7 +482,7 @@ public class Game {
     private void loop() throws Exception {
     	
     	initGame();
-    	
+        
     	double lastLoopTime = getTime();
     	float delta;
     	float timeCount=0;
@@ -510,8 +510,9 @@ public class Game {
             GL20.glUniformMatrix4fv(modelMatrixLocation, false, toFFB(modelMatrix));
             GL20.glUniform1i(useNormalColoringLocation, useNormalColoring);
             GL20.glUniform1i(useTextureLocation, useTexture);
+        
             GL20.glUseProgram(0);
-            
+
             //Mausposition abgreifen
             DoubleBuffer x = BufferUtils.createDoubleBuffer(1);
             DoubleBuffer y = BufferUtils.createDoubleBuffer(1);
@@ -528,10 +529,15 @@ public class Game {
             //System.out.println("X:"+xpos+", Y:"+ypos+" => XW="+worldX+", YW:"+worldY);
             
             //==================================Objekte updaten=================================
+
+        	paddleFront.setPos(worldX, worldY);		//Eigener Schläger
             if ((GameUtils.state == GameUtils.state.Running)){
-            	paddleFront.setPos(worldX, worldY);		//Eigener Schläger
             	paddleBack.AI_Act(ball);
             	ball.update(paddleFront, paddleBack);	//kugel
+            } else {
+            	double tz = paddleFront.getPos().z;
+            	double z = tz - Math.signum(tz)*(Ball.r+0.05);
+            	ball.setPos(new Vec3(worldX, worldY, z));
             }
             checkState();
             // ================================== Draw objects =================================
@@ -548,7 +554,10 @@ public class Game {
             wallRight.draw(pId);
             wallBot.draw(pId);
             paddleBack.draw(pId);
-		    ball.draw(pId);
+            if (GameUtils.state != GameUtils.state.Running) {
+            	ball.updateGraphics();
+            }
+            ball.draw(pId);
             paddleFront.draw(pId);
             GameUtils.drawHearts(pId);
             GameUtils.drawLevel(pId);
