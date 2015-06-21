@@ -90,7 +90,7 @@ public abstract class GameUtils {
 	
 	public static void adjustSpeed (Ball ball) {
 		Vec3 dirs = ball.getDirs();
-		dirs.z = Math.signum(dirs.z)*Math.pow(1.2, lvl-1)/fps;
+		dirs.z = Math.signum(dirs.z)*Math.pow(1.1, lvl-1)/fps;
 		ball.setDirs(dirs);
 	}
 	

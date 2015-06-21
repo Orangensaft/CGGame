@@ -99,9 +99,7 @@ public class Game {
     Wall wallLeft;
     Wall wallTop;
     Wall wallBot;
-    Ball ball;
-    
-    
+    Ball ball;    
     
     public void run() {
         System.out.println("Hello LWJGL " + Sys.getVersion() + "!");
@@ -556,10 +554,17 @@ public class Game {
             */
             GameUtils.adjustAI();
             GameUtils.adjustSpeed(ball);
+            
+            wallTop.update(ball, GameUtils.state);
+            wallLeft.update(ball, GameUtils.state);
+            wallRight.update(ball, GameUtils.state);
+            wallBot.update(ball, GameUtils.state);
+            
             wallTop.draw(pId);
             wallLeft.draw(pId);
             wallRight.draw(pId);
             wallBot.draw(pId);
+            
             paddleBack.draw(pId);
             if (GameUtils.state != GameUtils.state.Running) {
             	ball.updateGraphics();

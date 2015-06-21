@@ -12,6 +12,7 @@ import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 
+import simplePrimitives.GameUtils.GameState;
 import simplePrimitives.GameUtils.Sides;
 
 /**
@@ -22,8 +23,24 @@ import simplePrimitives.GameUtils.Sides;
 public class Wall {
 	
 	private float[] size = {1,5,0};
-	private int textureId = 0;
-	private String tex = "assets/wall.png";
+	
+	private final static int[] textures = new int[] {
+		GameUtils.loadPNGTexture("assets/wall.png", GL13.GL_TEXTURE0),
+		GameUtils.loadPNGTexture("assets/wall1.png", GL13.GL_TEXTURE0),
+		GameUtils.loadPNGTexture("assets/wall2.png", GL13.GL_TEXTURE0),
+		GameUtils.loadPNGTexture("assets/wall3.png", GL13.GL_TEXTURE0),
+		GameUtils.loadPNGTexture("assets/wall4.png", GL13.GL_TEXTURE0),
+		GameUtils.loadPNGTexture("assets/wall5.png", GL13.GL_TEXTURE0),
+		GameUtils.loadPNGTexture("assets/wall6.png", GL13.GL_TEXTURE0),
+		GameUtils.loadPNGTexture("assets/wall7.png", GL13.GL_TEXTURE0),
+		GameUtils.loadPNGTexture("assets/wall8.png", GL13.GL_TEXTURE0),
+		GameUtils.loadPNGTexture("assets/wall9.png", GL13.GL_TEXTURE0),
+		GameUtils.loadPNGTexture("assets/wall10.png", GL13.GL_TEXTURE0),
+	};
+
+	private int activeTexture;
+	private final double[] textureSections = new double[] {-0.9, -0.7, -0.5, -0.3, -0.1, 0.1, 0.3, 0.5, 0.7, 0.9};
+
 	private int verticesCount;
 	private Vec3 pos;
 	private Sides side;
@@ -56,8 +73,6 @@ public class Wall {
 			size[2]=depth;
 		}
 		this.pos=pos;
-        // Bind to the VAO that has all the information about the vertices
-		textureId = GameUtils.loadPNGTexture(tex, GL13.GL_TEXTURE0);
 		
 		updateGraphics();
 	}
@@ -252,13 +267,22 @@ public class Wall {
      	GL30.glBindVertexArray(0);
 	}
 	
+	public void update(Ball ball, GameState state) {
+		if (state == GameState.Running) {
+			// select texture to highlight balls position
+			double progrss = ball.getPos().z;
+			activeTexture = this.textures[closest(progrss, textureSections) + 1];
+		} else {
+			activeTexture = this.textures[0];
+		}
+	}
 	public void draw(int pId){
 		//Paddle zeichen
 		GL20.glUseProgram(pId);
         GL30.glBindVertexArray(vaoId);
         // Bind the texture
 		GL13.glActiveTexture(GL13.GL_TEXTURE0);
-		GL11.glBindTexture(GL11.GL_TEXTURE_2D, textureId);
+		GL11.glBindTexture(GL11.GL_TEXTURE_2D, activeTexture);
         GL20.glEnableVertexAttribArray(0);
         GL20.glEnableVertexAttribArray(1);
         GL20.glEnableVertexAttribArray(2);
@@ -275,5 +299,19 @@ public class Wall {
         GL20.glDisableVertexAttribArray(3);
         GL30.glBindVertexArray(0);
         GL20.glUseProgram(0);
+	}
+	
+	public int closest(double value, double[] sorted) {
+		  if(value < sorted[0])
+		    return 0;
+
+		  int i = 1;
+		  for( ; i < sorted.length && value > sorted[i] ; i++);
+
+		  if(i >= sorted.length)
+		    return sorted.length - 1;
+
+		  return Math.abs(value - sorted[i]) < Math.abs(value - sorted[i-1]) ?
+		         i : i-1;
 	}
 }
