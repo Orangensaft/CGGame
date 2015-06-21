@@ -83,10 +83,17 @@ public abstract class GameUtils {
 	public static BGMusicThread bg;
 	
 	public static void adjustAI () {
-		// should get noticably harder each level;
+		// should get noticeably harder each level;
 		// should not feel different on different fps;
 		AIDeltaDist = (0.5+.1d*lvl*lvl)/fps; 
 	}
+	
+	public static void adjustSpeed (Ball ball) {
+		Vec3 dirs = ball.getDirs();
+		dirs.z = Math.signum(dirs.z)*Math.pow(1.2, lvl-1)/fps;
+		ball.setDirs(dirs);
+	}
+	
 	public static float mousetoWorld(double mousePos,int max){
 		return (float) ((mousePos*1f/(max/2f))-1);
 	}
@@ -178,7 +185,7 @@ public abstract class GameUtils {
         GL11.glPixelStorei(GL11.GL_UNPACK_ALIGNMENT, 1);
          
         // Upload the texture data and generate mip maps (for scaling)
-        GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGB, tWidth, tHeight, 0, 
+        GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA, tWidth, tHeight, 0, 
                 GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, buf);
         GL30.glGenerateMipmap(GL11.GL_TEXTURE_2D);
          

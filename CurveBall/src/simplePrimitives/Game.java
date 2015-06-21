@@ -286,6 +286,10 @@ public class Game {
 		// Draw thicker lines
         GL11.glLineWidth(2);
         
+        // Transparency
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        
 	
 	//Load TinySound
     TinySound.init();
@@ -535,9 +539,11 @@ public class Game {
             	paddleBack.AI_Act(ball);
             	ball.update(paddleFront, paddleBack);	//kugel
             } else {
+            	// spawn ball at player paddle without spin
             	double tz = paddleFront.getPos().z;
             	double z = tz - Math.signum(tz)*(Ball.r+0.05);
             	ball.setPos(new Vec3(worldX, worldY, z));
+            	ball.setSpin(new Vec3(0,0,0));
             }
             checkState();
             // ================================== Draw objects =================================
@@ -549,6 +555,7 @@ public class Game {
             *Vorderes Paddle
             */
             GameUtils.adjustAI();
+            GameUtils.adjustSpeed(ball);
             wallTop.draw(pId);
             wallLeft.draw(pId);
             wallRight.draw(pId);
