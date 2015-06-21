@@ -56,7 +56,7 @@ public class Ball {
 		this.direction = new Vec3(0,0,0);
 		rotX = 0;
 		rotY = 0;
-		tex = "assets/wall.png";
+		tex = "assets/ball.png";
         // Bind to the VAO that has all the information about the vertices
 		textureID = GameUtils.loadPNGTexture(tex, GL13.GL_TEXTURE0);
 	}
@@ -256,27 +256,30 @@ public class Ball {
 		int indices[] = new int[2*x*(y) + (y)*2];
 		int ip = 0; // indices pointer
 		int tp = 4; // texture pointer
-		double slice_iteration = 1 / (y-1);
-		double stack_iteration = 1 / (x+1);
+		double slice_iteration = 1d / (y-1);
+		double stack_iteration = 1d / (x);
 		for (int slice=0; slice < y; slice ++) {
 			if (slice % 2 == 0) {
 				indices[ip++] = 0;
 				for (int stack=0; stack < x; stack ++) {
 					indices[ip++] = slice*x + stack + 2;
 					indices[ip++] = ((slice + 1) % y)*x + stack + 2; 
-					texture[tp++] = (float) stack_iteration * stack;
-					texture[tp++] = (float) slice_iteration * slice;
+					texture[tp++] = (float) (slice_iteration * slice);
+					texture[tp++] = (float) (stack_iteration * stack + stack_iteration);
 					}
 				indices[ip++] = 1;
+				System.out.printf("\n");
 			} else {
 				indices[ip++] = 1;
 				for (int stack=x - 1; stack >= 0; stack --) {
 					indices[ip++] = ((slice + 1)%y)*x + stack + 2;
 					indices[ip++] = slice*x + stack + 2;
-					texture[tp++] = (float) stack_iteration * stack;
-					texture[tp++] = (float) slice_iteration * slice;
+
+					texture[tp++] = (float) (slice_iteration * slice);
+					texture[tp++] = (float) (stack_iteration * stack + stack_iteration);
 					}
 				indices[ip++] = 0;
+				System.out.printf("\n");
 			}
 		}
 		// make buffers
@@ -449,8 +452,16 @@ public class Ball {
 		this.pos = pos;
 	}
 	
+	public void setSpin(Vec3 spin) {
+		this.spin = spin;
+	}
+	
 	public Vec3 getDirs(){
 		return this.direction;
+	}
+	
+	public void setDirs(Vec3 dirs){
+		this .direction = dirs;
 	}
 	
 	public float getR(){

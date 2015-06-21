@@ -1,11 +1,11 @@
 ========Texturierte Levelobjekte==========6
 (BallTextur?)
 ===========Spiellogik============4
--Spielstart ball richtung Gegner
+-Spielstart ball richtung Gegner |x|
 -Flugbahn/Winkel im Bezug zum Schläger
--KI
--Gewinnen -> KI wird besser (Paddle muss bezug auf lvl variable nehmen; dann passts)
-=> (Ball Schneller / KI schneller / Schlägergröße)
+-KI |x|
+-Gewinnen -> KI wird besser (Paddle muss bezug auf lvl variable nehmen; dann passts) |x|
+=> (Ball Schneller / KI schneller / Schlägergröße) |x|
 =========BONUS=================5
 -(Sound)
 -(Flugbahn)

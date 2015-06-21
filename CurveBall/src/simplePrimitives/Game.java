@@ -99,9 +99,7 @@ public class Game {
     Wall wallLeft;
     Wall wallTop;
     Wall wallBot;
-    Ball ball;
-    
-    
+    Ball ball;    
     
     public void run() {
         System.out.println("Hello LWJGL " + Sys.getVersion() + "!");
@@ -286,6 +284,10 @@ public class Game {
 		// Draw thicker lines
 
         GL11.glLineWidth(2);
+        
+        // Transparency
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         
 	
 	//Load TinySound
@@ -536,9 +538,11 @@ public class Game {
             	paddleBack.AI_Act(ball);
             	ball.update(paddleFront, paddleBack);	//kugel
             } else {
+            	// spawn ball at player paddle without spin
             	double tz = paddleFront.getPos().z;
             	double z = tz - Math.signum(tz)*(Ball.r+0.05);
             	ball.setPos(new Vec3(worldX, worldY, z));
+            	ball.setSpin(new Vec3(0,0,0));
             }
             checkState();
             // ================================== Draw objects =================================
@@ -550,10 +554,18 @@ public class Game {
             *Vorderes Paddle
             */
             GameUtils.adjustAI();
+            GameUtils.adjustSpeed(ball);
+            
+            wallTop.update(ball, GameUtils.state);
+            wallLeft.update(ball, GameUtils.state);
+            wallRight.update(ball, GameUtils.state);
+            wallBot.update(ball, GameUtils.state);
+            
             wallTop.draw(pId);
             wallLeft.draw(pId);
             wallRight.draw(pId);
             wallBot.draw(pId);
+            
             paddleBack.draw(pId);
             if (GameUtils.state != GameUtils.state.Running) {
             	ball.updateGraphics();
