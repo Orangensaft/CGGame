@@ -267,6 +267,7 @@ public class Paddle {
 	public void draw(int pId){
 		//Paddle zeichen
 		GL20.glUseProgram(pId);
+		
         // Bind to the VAO that has all the information about the vertices
 		// Bind the texture
 		GL13.glActiveTexture(GL13.GL_TEXTURE0);

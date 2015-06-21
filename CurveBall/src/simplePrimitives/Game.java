@@ -272,7 +272,7 @@ public class Game {
         
         // Viewport: Use full display size
         GL11.glViewport(0, 0, WIDTH, HEIGHT);
-        
+
         // Set the clear color - gray
         GL11.glClearColor(0.5f, 0.7f, 0.7f, 1.0f);
         
@@ -284,6 +284,7 @@ public class Game {
         glDisable(GL_CULL_FACE);
         
 		// Draw thicker lines
+
         GL11.glLineWidth(2);
         
 	
@@ -381,7 +382,7 @@ public class Game {
         errorCheckValue = GL11.glGetError();
         if (errorCheckValue != GL11.GL_NO_ERROR) {
         	//todo: error msg
-            System.out.println("ERROR - Could not create the shaders:");
+            System.out.println("ERROR - Could not create the shaders: "+errorCheckValue);
             System.exit(-1);
         }
         
