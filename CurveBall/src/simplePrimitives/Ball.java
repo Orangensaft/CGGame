@@ -11,11 +11,15 @@ import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 
 import mat.Axis;
+import mat.Matrix4;
+import mat.RotationMatrix;
+import mat.TranslationMatrix;
 import mat.Vec3;
 import mat.VectorHelper;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
+import java.util.ArrayList;
 
 /**
  * Ball-Klasse
@@ -45,6 +49,7 @@ public class Ball {
 	public int textureID;
 	private String tex;
 	private int indicesCount;
+	private Vec3 rotStep;
 	/**
 	 * Ball erstellen
 	 * @param pos ZENTRUM des Balls
@@ -54,11 +59,13 @@ public class Ball {
 		this.spin = new Vec3(0d,0d,0d);
 		this.spinStep = new Vec3(0d, 0d, 0d);
 		this.direction = new Vec3(0,0,0);
+		this.rotStep = new Vec3(0d, 0d, 0d);
 		rotX = 0;
 		rotY = 0;
-		tex = "assets/ball.png";
+		tex = "assets/ball_src.png";
         // Bind to the VAO that has all the information about the vertices
 		textureID = GameUtils.loadPNGTexture(tex, GL13.GL_TEXTURE0);
+		updateGraphics();
 	}
 	
 	public void setDirection(Vec3 dir){
@@ -78,21 +85,18 @@ public class Ball {
 		}
 		pos.x += direction.x;
 		if (Math.abs(spin.x) > spinStep.x){
-			rotX += Math.signum(spin.x)*spinStep.x;
-			rotX %= 2*Math.PI;
+			rotX += spin.x*GameUtils.fps;
 			pos.x += spin.x;
 			spin.x -= Math.signum(spin.x)*spinStep.x;
 		}
 		pos.y += direction.y; 
 		if (Math.abs(spin.y) > spinStep.y){
-			rotY += Math.signum(spin.y)*spinStep.y;
-			rotY %= 2*Math.PI;
+			rotY += spin.y*GameUtils.fps;
 			pos.y += spin.y;
 			spin.y -= Math.signum(spin.y)*spinStep.y;
 		}
 		pos.z += direction.z;
 		updateDirections(a,b);
-		updateGraphics();
 	}
 	
 	/**
@@ -107,20 +111,16 @@ public class Ball {
 			//GameUtils.sndHit.play();
 			direction.x = -direction.x;
 			spin.x = -spin.x;
-			pos.x = col == Sides.left ? GameUtils.left + r + 0.05d : GameUtils.right - r - 0.05d;
+			pos.x = col == Sides.left ? GameUtils.left + r + 0.005d : GameUtils.right - r - 0.005d;
 		}
 		if (col == Sides.top || col == Sides.bottom){
 
 			System.out.println("collided with floor / ceiling");
-			System.out.printf("pos:(%f, %f, %f); dir:(%f, %f, %f), spin:(%f, %f)\n", pos.x, pos.y, pos.z, 
-					direction.x, direction.y, direction.z,
-					spin.x,
-					spin.y);
 			GameUtils.requestSound(SoundType.WallCol);
 			//GameUtils.sndHit.play();
 			direction.y = -direction.y;
 			spin.y = - spin.y;
-			pos.y = col == Sides.top ? GameUtils.top + r + 0.05d: GameUtils.bottom - r -0.05d; 
+			pos.y = col == Sides.top ? GameUtils.top + r + 0.005d: GameUtils.bottom - r -0.005d; 
 		}
 		if (hitsPaddles(a,b)){
 			System.out.println("collided with paddle");
@@ -186,6 +186,7 @@ public class Ball {
 					spin.y += tmp.y*.05;
 					spinStep.x = Math.abs(spin.x/100d);
 					spinStep.y = Math.abs(spin.y/100d);
+					// calculate new position
 					double dst = posA.z - pos.z;
 					pos.z = posA.z - Math.signum(dst)*(r+0.05);
 					
@@ -202,86 +203,80 @@ public class Ball {
 	public void updateGraphics(){
 		int x = 10;
 		int y = 10;
-		float vertices[] = new float[x*y*3 + 2*3];
-		float normals[] = new float[x*y*3 + 2*3];
-		float texture[] = new float[x*y*2 + 4];
-		float colors[] = new float[x*y*4 + 2*4];
-		// pol points
-		vertices[0] = 0f + (float) pos.x;
-		vertices[1] = (float) Math.cos(rotX)*r + (float) pos.y;
-		vertices[2] = 0f + (float) pos.z;
-		normals[0] = 0;
-		normals[1] = vertices[1] - (float) pos.y;
-		normals[2] = 0;
-		texture[0] = 1;
-		texture[1] = 0.5f;
-
-		vertices[3] = 0f + (float) pos.x;
-		vertices[4] = (float) -Math.cos(rotX)*r + (float) pos.y;
-		vertices[5] = 0f + (float) pos.z;
-		normals[3] = 0f;
-		normals[4] = vertices[4] - (float) pos.y;
-		normals[5] = 0f;
-		texture[2] = 0;
-		texture[3] = 0.5f;
+		float vertices[] = new float[x*y*3];
+		float normals[] = new float[x*y*3];
+		float texture[] = new float[x*y*2];
+		float colors[] = new float[x*y*4];
+		
 
 		// prepare loop
-		int vp = 6; // vertex index
-		double hangle = 2*Math.PI / y; // horizonzal angle
-		double vangle = Math.PI / (x + 1); // vertical angle
+		int vp = 0; // vertex index
+		int tp = 0; // texture pointer
+		
+		double slice_iteration = 2*Math.PI / (y-1);
+		double stack_iteration = Math.PI / (x-1);
+		
+		double hangle = 2*Math.PI / (y-1); // horizonzal angle
+		double vangle = Math.PI / (x-1); // vertical angle
 		double hc,vc; // prepare vars for angle calculation
 		for ( int slice=0; slice < y; slice++) {
 			for ( int stack=0; stack < x; stack++) {
-				// Calculate angles: shift them by -Math.PI 
-				// so we can always connect the first vector of a slice with the upper pole
-				vc = -Math.PI + vangle * (stack + 1) + rotX; // cos(-pi) = 1
-				hc = -Math.PI + hangle * slice + rotY; // cos(-pi) = 1
+				vc = vangle * stack  + Math.PI;
+				hc = hangle * slice;
 				normals[vp] = (float) (Math.sin(vc) * Math.cos(hc));
 				normals[vp + 1] = (float) (Math.cos(vc));
 				normals[vp + 2] = (float) (Math.sin(vc) * Math.sin(hc));
 
-				vertices[vp] = normals[vp] * -r;
-				vertices[vp + 1] = normals[vp + 1] * -r;
-				vertices[vp + 2] = normals[vp + 2] * -r;
-				
-				vertices[vp] += pos.x;
-				vertices[vp + 1] += pos.y;
-				vertices[vp + 2] += pos.z;
+				vertices[vp] = normals[vp] * r;
+				vertices[vp + 1] = normals[vp + 1] * r;
+				vertices[vp + 2] = normals[vp + 2] * r;
+				System.out.printf("p%d: (%f, %f, %f)\t", vp, vertices[vp], vertices[vp+1], vertices[vp+2]);
+
+				texture[tp++] = (float) Math.sin(stack_iteration * stack + stack_iteration);
+				texture[tp++] = (float) Math.cos(slice_iteration * slice);
 
 				vp += 3;
 				// add color to every vertex
 			}
 		}
 		
-		int indices[] = new int[2*x*(y) + (y)*2];
+		int countStrips = x - 1;   //Bei zb Y-Subdivision 3, brauchen wir 2 Streifen
+        int vertPerStrip = y * 2;  //Es werden immer zwei ebenen verbunden
+        int ul; //index des unteren linken vertice im aktullen strip
+        int ur; //unterer rechter
+        int cur;
+        int xsub = y;
+        int ysub = x;
+        ArrayList<Integer> indices = new ArrayList(); //Arraylist ist bequemer
+        for (int i = 0; i < countStrips; i++) {
+            //Degeneriertes Dreieck (beim ersten durchlauf unnötig)
+            ul = i * xsub;
+            ur = ul + xsub - 1; //so viele stellen rechts daneben
+            cur = ur;   //Start ist unten rechts
+            indices.add(cur);
+            indices.add(cur);
+            for (int j = 0; j < vertPerStrip - 1; j++) {
+                if (j % 2 == 0) { //j ist gerade, wir befinden uns im aktuellen strip "unten"
+                    cur += xsub; //breite drauf rechen -> sprung nach "oben"
+                }
+                if (j % 2 == 1) {
+                    cur -= (xsub + 1); //nach unten links; eine zeile abziehen (xsub) und noch einen zusätzlich
+                }
+                indices.add(cur);
+            }
+            indices.add(ur);
+            cur = ul + xsub;
+            indices.add(cur);
+        }
+		/*
 		int ip = 0; // indices pointer
-		int tp = 4; // texture pointer
-		double slice_iteration = 1d / (y-1);
-		double stack_iteration = 1d / (x);
-		for (int slice=0; slice < y; slice ++) {
-			if (slice % 2 == 0) {
-				indices[ip++] = 0;
-				for (int stack=0; stack < x; stack ++) {
-					indices[ip++] = slice*x + stack + 2;
-					indices[ip++] = ((slice + 1) % y)*x + stack + 2; 
-					texture[tp++] = (float) (slice_iteration * slice);
-					texture[tp++] = (float) (stack_iteration * stack + stack_iteration);
-					}
-				indices[ip++] = 1;
-				System.out.printf("\n");
-			} else {
-				indices[ip++] = 1;
-				for (int stack=x - 1; stack >= 0; stack --) {
-					indices[ip++] = ((slice + 1)%y)*x + stack + 2;
-					indices[ip++] = slice*x + stack + 2;
-
-					texture[tp++] = (float) (slice_iteration * slice);
-					texture[tp++] = (float) (stack_iteration * stack + stack_iteration);
-					}
-				indices[ip++] = 0;
-				System.out.printf("\n");
-			}
+		for (int stack=0; stack < x; stack ++) {
+			for (int slice=0; slice < y; slice ++) {
+				indices[ip++] = stack*y + slice;
+				indices[ip++] = ((stack + 1) % x)*y + slice; 
+				}
 		}
+		*/
 		// make buffers
 		FloatBuffer textureCoordsBuffer = BufferUtils.createFloatBuffer(texture.length);
 		textureCoordsBuffer.put(texture);
@@ -295,10 +290,18 @@ public class Ball {
 		normalsBuffer.put(normals);
 		normalsBuffer.flip();
 		
-		IntBuffer indicesBuffer = BufferUtils.createIntBuffer(indices.length);
-		indicesBuffer.put(indices);
+
+        int[] out = new int[indices.size()];
+        for (int i = 0; i < indices.size(); i++) {
+
+            out[i] = indices.get(i);
+            System.out.println(out[i]);
+        }
+        
+		IntBuffer indicesBuffer = BufferUtils.createIntBuffer(out.length);
+		indicesBuffer.put(out);
 		indicesBuffer.flip();
-		indicesCount = indices.length;
+		indicesCount = out.length;
 		
 		// normal lines. Each line is represented by its start "vertex" and and "vertex + normalScale*normal"
 		float[] normalLines = new float[vertices.length*2];
@@ -421,6 +424,7 @@ public class Ball {
 	public void draw(int pId){
 		//Paddle zeichen
 		GL20.glUseProgram(pId);
+        
         // Bind to the VAO that has all the information about the vertices
 		// Bind the texture
 		GL13.glActiveTexture(GL13.GL_TEXTURE0);
@@ -466,5 +470,9 @@ public class Ball {
 	
 	public float getR(){
 		return this.r;
+	}
+	
+	public Vec3 getRot(){
+		return new Vec3(rotX, rotY, 0d);
 	}
 }

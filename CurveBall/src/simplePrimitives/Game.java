@@ -72,7 +72,7 @@ public class Game {
     // Moving variables
     private int projectionMatrixLocation = 0;
     private int viewMatrixLocation = 0;
-    private int modelMatrixLocation = 0;
+    public int modelMatrixLocation = 0;
     private int projectionMatrixLocationNormals = 0; // separate one for normals
     private int viewMatrixLocationNormals = 0;// separate one for normals
     private int modelMatrixLocationNormals = 0;// separate one for normals
@@ -295,18 +295,18 @@ public class Game {
     GameUtils.bg = new BGMusicThread(TinySound.loadMusic(new File("assets/bg.wav")));
 	GameUtils.bg.run();
 	
-	Vec3 hPos = new Vec3(-1.2,1.2,1);
+	Vec3 hPos = new Vec3(1,1.2,1);
 	System.out.println("INIT");
 	for (int i=0;i<3;i++){
 		GameUtils.hearts[i] = new Heart(hPos);
-		hPos.x += 0.125;
+		hPos.x -= 0.125;
 	}
 	
-	hPos.x +=.5;
+	hPos.x -=.5;
 	
 	for (int i=0;i<10;i++){
 		GameUtils.lvlGui[i] = new Skull(hPos);
-		hPos.x +=0.125;
+		hPos.x -=0.125;
 	}
 	
 	
@@ -326,7 +326,7 @@ public class Game {
     private void setupMatrices() {
      	
     	// Setup projection and view matrix
-    	projectionMatrix = new PerspectiveMatrix(GameUtils.near,GameUtils.far,GameUtils.left,GameUtils.right,GameUtils.bottom,GameUtils.top);
+    	projectionMatrix = new PerspectiveMatrix(GameUtils.left,GameUtils.right,GameUtils.bottom,GameUtils.top,GameUtils.near,GameUtils.far);
     	viewMatrix = new TranslationMatrix(cameraPos);
     }
     
@@ -448,7 +448,7 @@ public class Game {
     	wallTop = new Wall(new Vec3(-1,1,-1),Sides.top,2f,2f);
     	wallBot = new Wall(new Vec3(-1,-1,-1),Sides.bottom,2f,2f);
     	// Ball
-    	ball = new Ball(new Vec3(0, 0, 1-2*Ball.r));
+    	ball = new Ball(new Vec3(0, 0, 1-Ball.r-0.005d));
     	GameUtils.setLevel(1);
     	GameUtils.setLives(3);
     }
@@ -464,7 +464,7 @@ public class Game {
     	if (GameUtils.state == GameUtils.GameState.PointPlayer){
     		GameUtils.setLevel(GameUtils.getLevel()+1); // Level up!
     		//Reset Ball position.
-    		ball = new Ball(new Vec3(0, 0, 1-2*Ball.r));
+    		ball = new Ball(new Vec3(0, 0, 1-Ball.r-0.005d));
     		GameUtils.state = GameUtils.state.AfterPoint;
     	}
 		if (GameUtils.getLives()<1){ //Gameover
@@ -525,11 +525,17 @@ public class Game {
             double ypos=y.get();
             ypos = ypos>=0 ? ypos : 0;
             ypos = ypos<=HEIGHT ? ypos : HEIGHT;
-            float worldX = GameUtils.mousetoWorld(xpos, WIDTH);
+            float worldX = -1*GameUtils.mousetoWorld(xpos, WIDTH);
             //*-1 weil fenster koordinaten oben links beginnen
             float worldY = -1*GameUtils.mousetoWorld(ypos, HEIGHT);
             //System.out.println("X:"+xpos+", Y:"+ypos+" => XW="+worldX+", YW:"+worldY);
             
+            float px = paddleFront.size[0]*.5f;
+            float py = paddleFront.size[1]*.5f;
+            worldX = worldX>=-1+px ? worldX : -1+px;
+            worldX = worldX<=1-px ? worldX : 1-px;
+            worldY = worldY>=-1+py ? worldY : -1+py;
+            worldY = worldY<=1-py ? worldY : 1-py;
             //==================================Objekte updaten=================================
 
         	paddleFront.setPos(worldX, worldY);		//Eigener SchlÃ¤ger
@@ -539,7 +545,7 @@ public class Game {
             } else {
             	// spawn ball at player paddle without spin
             	double tz = paddleFront.getPos().z;
-            	double z = tz - Math.signum(tz)*(Ball.r+0.05);
+            	double z = 1 - (Ball.r+0.005d);
             	ball.setPos(new Vec3(worldX, worldY, z));
             	ball.setSpin(new Vec3(0,0,0));
             }
@@ -566,10 +572,23 @@ public class Game {
             wallBot.draw(pId);
             
             paddleBack.draw(pId);
-            if (GameUtils.state != GameUtils.state.Running) {
-            	ball.updateGraphics();
-            }
+            Vec3 rot = ball.getRot();
+            Vec3 pos = ball.getPos();
+            modelMatrix = (Matrix4) new TranslationMatrix(new Vec3(pos.x,pos.y,1+pos.z));  // translate...
+            modelMatrix = (Matrix4) new RotationMatrix(modelAngle.y, mat.Axis.Y).mul(modelMatrix); // ... and rotate, multiply matrices 
+            GL20.glUseProgram(pId);
+            GL20.glUniformMatrix4fv(modelMatrixLocation, false, toFFB(modelMatrix));
+            GL20.glUseProgram(0);
+            
             ball.draw(pId);
+            
+            // ball ändert modelMatrix -> reset;
+            modelMatrix = new TranslationMatrix(new Vec3(0,0,1));  // translate...
+            modelMatrix = (Matrix4) new RotationMatrix(modelAngle.y, mat.Axis.Y).mul(modelMatrix); // ... and rotate, multiply matrices 
+
+            GL20.glUseProgram(pId);
+            GL20.glUniformMatrix4fv(modelMatrixLocation, false, toFFB(modelMatrix));
+            GL20.glUseProgram(0);
             paddleFront.draw(pId);
             GameUtils.drawHearts(pId);
             GameUtils.drawLevel(pId);
@@ -587,7 +606,7 @@ public class Game {
      * @param m
      * @return
      */
-	private FloatBuffer toFFB(Matrix4 m){
+	public FloatBuffer toFFB(Matrix4 m){
 		FloatBuffer res = BufferUtils.createFloatBuffer(16);
 		for (int i=0;i<4;i++){
 			for (int j=0;j<4;j++){
