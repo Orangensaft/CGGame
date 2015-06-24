@@ -153,7 +153,7 @@ public class Paddle {
 		
 		//Indizes
 		// OpenGL expects to draw the first vertices in counter clockwise order by default
-		int[] indices = {1,2,0,3};	
+		int[] indices = {0,3,1,2};	
 		indicesCount = indices.length;
 		IntBuffer indicesBuffer = BufferUtils.createIntBuffer(indicesCount);
 		indicesBuffer.put(indices);

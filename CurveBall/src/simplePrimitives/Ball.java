@@ -85,13 +85,13 @@ public class Ball {
 		}
 		pos.x += direction.x;
 		if (Math.abs(spin.x) > spinStep.x){
-			rotX += spin.x*GameUtils.fps;
+			rotX += Math.PI*spin.x*GameUtils.fps;
 			pos.x += spin.x;
 			spin.x -= Math.signum(spin.x)*spinStep.x;
 		}
 		pos.y += direction.y; 
 		if (Math.abs(spin.y) > spinStep.y){
-			rotY += spin.y*GameUtils.fps;
+			rotY += Math.PI*spin.y*GameUtils.fps;
 			pos.y += spin.y;
 			spin.y -= Math.signum(spin.y)*spinStep.y;
 		}
@@ -201,8 +201,8 @@ public class Ball {
 	 * Ball Zeichen
 	 */
 	public void updateGraphics(){
-		int x = 10;
-		int y = 10;
+		int x = 20;
+		int y = 20;
 		float vertices[] = new float[x*y*3];
 		float normals[] = new float[x*y*3];
 		float texture[] = new float[x*y*2];
@@ -213,14 +213,14 @@ public class Ball {
 		int vp = 0; // vertex index
 		int tp = 0; // texture pointer
 		
-		double slice_iteration = 2*Math.PI / (y-1);
-		double stack_iteration = Math.PI / (x-1);
+		double slice_iteration = 1d / (y);
+		double stack_iteration = 1d / (x);
 		
-		double hangle = 2*Math.PI / (y-1); // horizonzal angle
+		double hangle = 2*Math.PI / (y); // horizonzal angle
 		double vangle = Math.PI / (x-1); // vertical angle
 		double hc,vc; // prepare vars for angle calculation
-		for ( int slice=0; slice < y; slice++) {
-			for ( int stack=0; stack < x; stack++) {
+		for ( int stack=0; stack < x; stack++) {
+			for ( int slice=0; slice < y; slice++) {
 				vc = vangle * stack  + Math.PI;
 				hc = hangle * slice;
 				normals[vp] = (float) (Math.sin(vc) * Math.cos(hc));
@@ -230,30 +230,29 @@ public class Ball {
 				vertices[vp] = normals[vp] * r;
 				vertices[vp + 1] = normals[vp + 1] * r;
 				vertices[vp + 2] = normals[vp + 2] * r;
-				System.out.printf("p%d: (%f, %f, %f)\t", vp, vertices[vp], vertices[vp+1], vertices[vp+2]);
+				System.out.printf("p%d: (%.1f, %.1f, %.1f)\t", vp/3, vertices[vp], vertices[vp+1], vertices[vp+2]);
 
-				texture[tp++] = (float) Math.sin(stack_iteration * stack + stack_iteration);
-				texture[tp++] = (float) Math.cos(slice_iteration * slice);
+				texture[tp++] = (float) (slice_iteration * slice);
+				texture[tp++] = (float) (stack_iteration * stack + stack_iteration);
 
 				vp += 3;
-				// add color to every vertex
 			}
+			System.out.println();
 		}
-		
-		int countStrips = x - 1;   //Bei zb Y-Subdivision 3, brauchen wir 2 Streifen
-        int vertPerStrip = y * 2;  //Es werden immer zwei ebenen verbunden
+
+        int xsub = y;
+        int ysub = x;
+		int countStrips = ysub - 1;   //Bei zb Y-Subdivision 3, brauchen wir 2 Streifen
+        int vertPerStrip = xsub * 2;  //Es werden immer zwei ebenen verbunden
         int ul; //index des unteren linken vertice im aktullen strip
         int ur; //unterer rechter
         int cur;
-        int xsub = y;
-        int ysub = x;
         ArrayList<Integer> indices = new ArrayList(); //Arraylist ist bequemer
         for (int i = 0; i < countStrips; i++) {
             //Degeneriertes Dreieck (beim ersten durchlauf unnötig)
             ul = i * xsub;
             ur = ul + xsub - 1; //so viele stellen rechts daneben
             cur = ur;   //Start ist unten rechts
-            indices.add(cur);
             indices.add(cur);
             for (int j = 0; j < vertPerStrip - 1; j++) {
                 if (j % 2 == 0) { //j ist gerade, wir befinden uns im aktuellen strip "unten"
@@ -265,19 +264,11 @@ public class Ball {
                 indices.add(cur);
             }
             indices.add(ur);
-            cur = ul + xsub;
+            cur = ur + xsub;
             indices.add(cur);
         }
-		/*
-		int ip = 0; // indices pointer
-		for (int stack=0; stack < x; stack ++) {
-			for (int slice=0; slice < y; slice ++) {
-				indices[ip++] = stack*y + slice;
-				indices[ip++] = ((stack + 1) % x)*y + slice; 
-				}
-		}
-		*/
-		// make buffers
+        
+        // make buffers
 		FloatBuffer textureCoordsBuffer = BufferUtils.createFloatBuffer(texture.length);
 		textureCoordsBuffer.put(texture);
 		textureCoordsBuffer.flip();
@@ -289,14 +280,18 @@ public class Ball {
 		FloatBuffer normalsBuffer = BufferUtils.createFloatBuffer(normals.length);
 		normalsBuffer.put(normals);
 		normalsBuffer.flip();
-		
+		System.out.println("");
+		System.out.println(normals.length/3);
+		System.out.println("");
 
         int[] out = new int[indices.size()];
         for (int i = 0; i < indices.size(); i++) {
 
             out[i] = indices.get(i);
-            System.out.println(out[i]);
+            System.out.printf("%d, ",out[i]);
         }
+
+		System.out.println("");
         
 		IntBuffer indicesBuffer = BufferUtils.createIntBuffer(out.length);
 		indicesBuffer.put(out);
@@ -474,5 +469,13 @@ public class Ball {
 	
 	public Vec3 getRot(){
 		return new Vec3(rotX, rotY, 0d);
+	}
+	
+	private static int mod(int a, int b) {
+		return (((a % b) + b) % b);
+	}
+	
+	private static double mod(double a, int b) {
+		return (((a % b) + b) % b);
 	}
 }

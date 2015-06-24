@@ -581,7 +581,9 @@ public class Game {
             
             Vec3 rot = ball.getRot();
             Vec3 pos = ball.getPos();
-            modelMatrix = (Matrix4) new TranslationMatrix(new Vec3(pos.x,pos.y,1+pos.z));  // translate...
+            modelMatrix = (Matrix4) new RotationMatrix(-rot.x, mat.Axis.Y);
+            modelMatrix = (Matrix4) new RotationMatrix(-rot.y, mat.Axis.X).mul(modelMatrix);
+            modelMatrix = (Matrix4) new TranslationMatrix(new Vec3(pos.x,pos.y,1+pos.z)).mul(modelMatrix);  // translate...
             modelMatrix = (Matrix4) new RotationMatrix(modelAngle.y, mat.Axis.Y).mul(modelMatrix); // ... and rotate, multiply matrices 
             GL20.glUseProgram(pId);
             GL20.glUniformMatrix4fv(modelMatrixLocation, false, toFFB(modelMatrix));

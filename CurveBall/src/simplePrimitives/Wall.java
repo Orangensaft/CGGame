@@ -54,6 +54,7 @@ public class Wall {
 	private int vaoNormalLinesId;
 	private int vbonlId;
 	private int vbonlcId;
+	private int[] indices;
 	/**
 	 * Ursprung unten links
 	 * @param pos Ausgangspunkt
@@ -67,10 +68,18 @@ public class Wall {
 			size[0]=0;	//Hochkant
 			size[1]=width;
 			size[2]=depth;
+			indices = new int[] {0,1,3,2};
+			if (side == Sides.left) {
+				indices = new int[] {0,3,1,2};	
+			}
 		}else{
 			size[0]=width;
 			size[1]=0;	//Horizontal
 			size[2]=depth;
+			indices = new int[] {3,2,0,1};	
+			if (side == Sides.bottom) {
+				indices = new int[] {3,0,2,1};
+			}
 		}
 		this.pos=pos;
 		
@@ -82,18 +91,22 @@ public class Wall {
 		float dz = size[1];
 		int i = 0;
 		
+		// hinten links unten
 		verts[i++]=(float) pos.x;
 		verts[i++]=(float) pos.y;
 		verts[i++]=(float) pos.z;
 		
+		//hinten rechts oben
 		verts[i++]=(float) pos.x+size[0];
 		verts[i++]=(float) pos.y+size[1];
 		verts[i++]=(float) pos.z;
-
+		
+		//vorne rechts oben
 		verts[i++]=(float) pos.x+size[0];
 		verts[i++]=(float) pos.y+size[1];
 		verts[i++]=(float) pos.z+size[2];
 
+		//vorne links unten
 		verts[i++]=(float) pos.x;
 		verts[i++]=(float) pos.y;
 		verts[i++]=(float) pos.z+size[2];
@@ -155,7 +168,6 @@ public class Wall {
 		
 		//Indizes
 		// OpenGL expects to draw the first vertices in counter clockwise order by default
-		int[] indices = {3,2,0,1};	
 		indicesCount = indices.length;
 		IntBuffer indicesBuffer = BufferUtils.createIntBuffer(indicesCount);
 		indicesBuffer.put(indices);
