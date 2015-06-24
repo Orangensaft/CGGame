@@ -26,7 +26,7 @@ import org.newdawn.slick.util.ResourceLoader;
  */
 public class Paddle {
 	private Vec3 pos; //Position
-	private float[] size = {.5f,.5f}; //Gr��e des Schl�gers; Breite/H�he
+	public float[] size = {.5f,.5f}; //Gr��e des Schl�gers; Breite/H�he
 	public int vaoId;
 	public int vboId;
 	public int vbocId;
