@@ -56,7 +56,7 @@ public class Game {
  
     // The window handle
     private long window;
-    
+   
     // Window size
     private int WIDTH = 800;
     private int HEIGHT = 640;
@@ -100,6 +100,7 @@ public class Game {
     Wall wallTop;
     Wall wallBot;
     Ball ball;    
+    boolean aiOnly = false;
     
     public void run() {
         System.out.println("Hello LWJGL " + Sys.getVersion() + "!");
@@ -175,6 +176,10 @@ public class Game {
             	//Leben hinzufügen
             	if (key == GLFW_KEY_Q && action == GLFW_PRESS){
             		GameUtils.setLives((GameUtils.getLives()+1)%4);
+            	}
+            	
+            	if (key == GLFW_KEY_A && action == GLFW_PRESS){
+            		aiOnly ^= true;
             	}
             	
             	//Spiel pausieren
@@ -540,9 +545,13 @@ public class Game {
             //==================================Objekte updaten=================================
 
             if (GameUtils.state != GameUtils.GameState.Paused){
-	
+            	
+            	if (!aiOnly)
 	        	paddleFront.setPos(worldX, worldY);		//Eigener Schläger
-	            if ((GameUtils.state == GameUtils.state.Running)){
+	            
+	        	if ((GameUtils.state == GameUtils.state.Running)){
+	        		if (aiOnly)
+	        			paddleFront.AI_Act(ball);
 	            	paddleBack.AI_Act(ball);
 	            	ball.update(paddleFront, paddleBack);	//kugel
 	            } else {
@@ -553,6 +562,7 @@ public class Game {
 	            	ball.setSpin(new Vec3(0,0,0));
 	            }
 	            checkState();
+	            
 	            GameUtils.adjustAI();
 	            GameUtils.adjustSpeed(ball);
 	            
