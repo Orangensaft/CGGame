@@ -539,18 +539,30 @@ public class Game {
             worldY = worldY<=1-py ? worldY : 1-py;
             //==================================Objekte updaten=================================
 
-        	paddleFront.setPos(worldX, worldY);		//Eigener Schläger
-            if ((GameUtils.state == GameUtils.state.Running)){
-            	paddleBack.AI_Act(ball);
-            	ball.update(paddleFront, paddleBack);	//kugel
-            } else {
-            	// spawn ball at player paddle without spin
-            	double tz = paddleFront.getPos().z;
-            	double z = 1 - (Ball.r+0.005d);
-            	ball.setPos(new Vec3(worldX, worldY, z));
-            	ball.setSpin(new Vec3(0,0,0));
+            if (GameUtils.state != GameUtils.GameState.Paused){
+	
+	        	paddleFront.setPos(worldX, worldY);		//Eigener Schläger
+	            if ((GameUtils.state == GameUtils.state.Running)){
+	            	paddleBack.AI_Act(ball);
+	            	ball.update(paddleFront, paddleBack);	//kugel
+	            } else {
+	            	// spawn ball at player paddle without spin
+	            	double tz = paddleFront.getPos().z;
+	            	double z = 1 - (Ball.r+0.005d);
+	            	ball.setPos(new Vec3(worldX, worldY, z));
+	            	ball.setSpin(new Vec3(0,0,0));
+	            }
+	            checkState();
+	            GameUtils.adjustAI();
+	            GameUtils.adjustSpeed(ball);
+	            
+	            wallTop.update(ball, GameUtils.state);
+	            wallLeft.update(ball, GameUtils.state);
+	            wallRight.update(ball, GameUtils.state);
+	            wallBot.update(ball, GameUtils.state);
+        	
             }
-            checkState();
+            
             // ================================== Draw objects =================================
             /*Hier die Objekte von hinten nach vorne zeichen
             *-> Painters-Algo
@@ -559,20 +571,14 @@ public class Game {
             *Kugel
             *Vorderes Paddle
             */
-            GameUtils.adjustAI();
-            GameUtils.adjustSpeed(ball);
-            
-            wallTop.update(ball, GameUtils.state);
-            wallLeft.update(ball, GameUtils.state);
-            wallRight.update(ball, GameUtils.state);
-            wallBot.update(ball, GameUtils.state);
+
             
             wallTop.draw(pId);
             wallLeft.draw(pId);
             wallRight.draw(pId);
             wallBot.draw(pId);
-            
             paddleBack.draw(pId);
+            
             Vec3 rot = ball.getRot();
             Vec3 pos = ball.getPos();
             modelMatrix = (Matrix4) new TranslationMatrix(new Vec3(pos.x,pos.y,1+pos.z));  // translate...
@@ -583,7 +589,7 @@ public class Game {
             
             ball.draw(pId);
             
-            // ball �ndert modelMatrix -> reset;
+            // ball �ndert modelMatrix -> reset;
             modelMatrix = new TranslationMatrix(new Vec3(0,0,1));  // translate...
             modelMatrix = (Matrix4) new RotationMatrix(modelAngle.y, mat.Axis.Y).mul(modelMatrix); // ... and rotate, multiply matrices 
 
