@@ -86,7 +86,7 @@ public class Game {
     // toggles & interactions
     private boolean showMesh = true;
     private boolean showNormals = false;
-    private boolean useBackfaceCulling = false;
+    private boolean useBackfaceCulling = true;
     private int useNormalColoring = 0;
     private int useNormalColoringLocation = 0;
     private int useTexture = 1;
@@ -284,7 +284,8 @@ public class Game {
 		// Draw thicker lines
 
         GL11.glLineWidth(2);
-        
+        // Back Culling standard an
+        glEnable(GL_CULL_FACE);
         // Transparency
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
