@@ -10,6 +10,7 @@
 	</classpathentry>
 	<classpathentry kind="lib" path="lwjgl/jar/lwjgl.jar">
 		<attributes>
+			<attribute name="javadoc_location" value="jar:platform:/resource/CurveBall/lwjgl/doc/javadoc.zip!/"/>
 			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="CurveBall/lwjgl/native"/>
 		</attributes>
 	</classpathentry>

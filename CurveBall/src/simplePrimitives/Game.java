@@ -101,6 +101,11 @@ public class Game {
     Wall wallBot;
     Ball ball;    
     boolean aiOnly = false;
+	private Planar GameOver;
+	private Planar Point;
+	private Planar Player1;
+	private Planar Player2;
+	private int point;
     
     public void run() {
         System.out.println("Hello LWJGL " + Sys.getVersion() + "!");
@@ -147,7 +152,6 @@ public class Game {
         window = glfwCreateWindow(WIDTH, HEIGHT, "CurveBall by Jan F. & Nicolas M.", NULL, NULL);
         if ( window == NULL )
             throw new RuntimeException("Failed to create the GLFW window");
- 
         // Setup a key callback. It will be called every time a key is pressed, repeated or released.
         glfwSetKeyCallback(window, keyCallback = new GLFWKeyCallback() {
             @Override
@@ -252,7 +256,7 @@ public class Game {
  
         // Make the window visible
         glfwShowWindow(window);
-        
+
         // Setup a window size callback for viewport adjusting while resizing
         glfwSetWindowSizeCallback(window, window_size_callback = new GLFWWindowSizeCallback() {
 			@Override
@@ -284,7 +288,7 @@ public class Game {
         // -> back to solid faces: glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
  
         // Backface culling: Shows, if the triangles are correctly defined
-        glDisable(GL_CULL_FACE);
+        // glDisable(GL_CULL_FACE);
         
 		// Draw thicker lines
 
@@ -294,6 +298,8 @@ public class Game {
         // Transparency
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        //GL11.glHint(GL11.GL_PERSPECTIVE_CORRECTION_HINT, GL11.GL_NICEST);
         
 	
 	//Load TinySound
@@ -316,7 +322,7 @@ public class Game {
 		hPos.x -=0.125;
 	}
 	
-	
+	 
 	
 	
 	// Initialize Sound Board
@@ -456,6 +462,10 @@ public class Game {
     	wallBot = new Wall(new Vec3(-1,-1,-1),Sides.bottom,2f,2f);
     	// Ball
     	ball = new Ball(new Vec3(0, 0, 1-Ball.r-0.005d));
+    	GameOver = new Planar( new Vec3(0,0,1d), new Vec3(1.5,1.5,0), "assets/GameOver.png");
+    	Point = new Planar( new Vec3(0.3, 0, 1), new Vec3(1,1,0), "assets/point.png");
+    	Player1 = new Planar( new Vec3(-0.3, 0, 1), new Vec3(1,1,0), "assets/player1.png");
+    	Player2 = new Planar( new Vec3(-0.3, 0, 1), new Vec3(1,1,0), "assets/player2.png");
     	GameUtils.setLevel(1);
     	GameUtils.setLives(3);
     }
@@ -466,12 +476,15 @@ public class Game {
     private void checkState(){
     	if (GameUtils.state == GameUtils.GameState.PointPC){
     		GameUtils.setLives(GameUtils.getLives()-1); //Loose 1 live
+    		point = 1;
     		GameUtils.state = GameUtils.state.AfterPoint;
     	}
     	if (GameUtils.state == GameUtils.GameState.PointPlayer){
     		GameUtils.setLevel(GameUtils.getLevel()+1); // Level up!
     		//Reset Ball position.
-    		ball = new Ball(new Vec3(0, 0, 1-Ball.r-0.005d));
+    		ball.setPos(new Vec3(0, 0, 1-Ball.r-0.005d));
+    		ball.setSpin(new Vec3(0,0,0));
+    		point = 0;
     		GameUtils.state = GameUtils.state.AfterPoint;
     	}
 		if (GameUtils.getLives()<1){ //Gameover
@@ -574,6 +587,9 @@ public class Game {
         	
             }
             
+            if (GameUtils.isLost) {
+            //	GameOver.draw(pID);
+            }
             // ================================== Draw objects =================================
             /*Hier die Objekte von hinten nach vorne zeichen
             *-> Painters-Algo
@@ -609,9 +625,18 @@ public class Game {
             GL20.glUseProgram(pId);
             GL20.glUniformMatrix4fv(modelMatrixLocation, false, toFFB(modelMatrix));
             GL20.glUseProgram(0);
+            
             paddleFront.draw(pId);
             GameUtils.drawHearts(pId);
             GameUtils.drawLevel(pId);
+            if (GameUtils.state == GameUtils.state.AfterPoint) {
+            	Point.draw(pId);
+            	if (point == 0) Player1.draw(pId);
+            	if (point == 1) Player2.draw(pId);
+            }
+            if (GameUtils.getLives()<1 && GameUtils.state == GameUtils.state.BeforeStart) {
+            	GameOver.draw(pId);
+            }
             //===============ENDE=========================
     	    glfwSwapBuffers(window);
             glfwPollEvents();

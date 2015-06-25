@@ -18,6 +18,7 @@ import simplePrimitives.GameUtils.Sides;
 /**
  * Einzelnes Wandsegment
  * @author Nicolas
+ * @author Jan
  *
  */
 public class Wall {
