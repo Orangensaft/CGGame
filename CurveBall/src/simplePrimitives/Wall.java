@@ -42,7 +42,6 @@ public class Wall {
 	private int activeTexture;
 	private final double[] textureSections = new double[] {-0.9, -0.7, -0.5, -0.3, -0.1, 0.1, 0.3, 0.5, 0.7, 0.9};
 
-	private int verticesCount;
 	private Vec3 pos;
 	private Sides side;
 	private int indicesCount;
@@ -88,8 +87,6 @@ public class Wall {
 	}
 	private void updateGraphics() {
 		float[] verts = new float[4*3];
-		float dxy = size[0];
-		float dz = size[1];
 		int i = 0;
 		
 		// hinten links unten
@@ -115,7 +112,6 @@ public class Wall {
 		FloatBuffer verticesBuffer = BufferUtils.createFloatBuffer(verts.length);
 		verticesBuffer.put(verts);
 		verticesBuffer.flip();
-		verticesCount = verts.length/3;
 		
 		//Farben
 		float[] colors = {
@@ -284,9 +280,9 @@ public class Wall {
 		if (state == GameState.Running) {
 			// select texture to highlight balls position
 			double progrss = ball.getPos().z;
-			activeTexture = this.textures[closest(progrss, textureSections) + 1];
+			activeTexture = Wall.textures[closest(progrss, textureSections) + 1];
 		} else {
-			activeTexture = this.textures[0];
+			activeTexture = Wall.textures[0];
 		}
 	}
 	public void draw(int pId){

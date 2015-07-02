@@ -12,7 +12,6 @@ import org.lwjgl.opengl.GL30;
 
 import mat.Vec3;
 import simplePrimitives.GameUtils;
-import simplePrimitives.GameUtils.SoundType;
 /**
  * Klasse f�r Levelanzeige
  * @author Nicolas
@@ -32,12 +31,8 @@ public class Skull {
 	public int vbonlcId;
 	public int textureID;
 
-	// slope variables for ball curve
-	private Vec3 slope;
-
 	private int indicesCount;
 	private String tex="";
-	private int verticesCount;
 	private boolean visible = true;
 	/**
 	 * @param pos ZENTRUM
@@ -75,7 +70,6 @@ public class Skull {
 		FloatBuffer verticesBuffer = BufferUtils.createFloatBuffer(verts.length);
 		verticesBuffer.put(verts);
 		verticesBuffer.flip();
-		verticesCount = verts.length/3;
 		
 		//Farben
 		float[] colors = {

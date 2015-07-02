@@ -12,8 +12,6 @@ import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 
-import simplePrimitives.GameUtils.GameState;
-import simplePrimitives.GameUtils.Sides;
 
 /*
  * Einzelnes Wandsegment
@@ -25,7 +23,6 @@ import simplePrimitives.GameUtils.Sides;
 public class Planar {	
 	private int textureID;
 	
-	private int verticesCount;
 	private Vec3 pos;
 	private Vec3 size;
 	private int indicesCount;
@@ -82,7 +79,6 @@ public class Planar {
 		FloatBuffer verticesBuffer = BufferUtils.createFloatBuffer(verts.length);
 		verticesBuffer.put(verts);
 		verticesBuffer.flip();
-		verticesCount = verts.length/3;
 		
 		//Farben
 		float[] colors = {

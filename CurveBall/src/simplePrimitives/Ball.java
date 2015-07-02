@@ -10,12 +10,7 @@ import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 
-import mat.Axis;
-import mat.Matrix4;
-import mat.RotationMatrix;
-import mat.TranslationMatrix;
 import mat.Vec3;
-import mat.VectorHelper;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
@@ -29,7 +24,6 @@ import java.util.ArrayList;
  *
  */
 public class Ball {
-	VectorHelper VecCalc = new VectorHelper();
 	private Vec3 direction; //Bewegungsrichtung
 	private Vec3 pos; //Position
 	private Vec3 spin; // Drehung
@@ -49,7 +43,6 @@ public class Ball {
 	public int textureID;
 	private String tex;
 	private int indicesCount;
-	private Vec3 rotStep;
 	/**
 	 * Ball erstellen
 	 * @param pos ZENTRUM des Balls
@@ -59,7 +52,6 @@ public class Ball {
 		this.spin = new Vec3(0d,0d,0d);
 		this.spinStep = new Vec3(0d, 0d, 0d);
 		this.direction = new Vec3(0,0,0);
-		this.rotStep = new Vec3(0d, 0d, 0d);
 		rotX = 0;
 		rotY = 0;
 		tex = "assets/ball_src.png";
@@ -247,7 +239,7 @@ public class Ball {
         int ul; //index des unteren linken vertice im aktullen strip
         int ur; //unterer rechter
         int cur;
-        ArrayList<Integer> indices = new ArrayList(); //Arraylist ist bequemer
+        ArrayList<Integer> indices = new ArrayList<Integer>(); //Arraylist ist bequemer
         for (int i = 0; i < countStrips; i++) {
             //Degeneriertes Dreieck (beim ersten durchlauf unnötig)
             ul = i * xsub;
@@ -469,13 +461,5 @@ public class Ball {
 	
 	public Vec3 getRot(){
 		return new Vec3(rotX, rotY, 0d);
-	}
-	
-	private static int mod(int a, int b) {
-		return (((a % b) + b) % b);
-	}
-	
-	private static double mod(double a, int b) {
-		return (((a % b) + b) % b);
 	}
 }

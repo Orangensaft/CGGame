@@ -12,7 +12,6 @@ import org.lwjgl.opengl.GL30;
 
 import mat.Vec3;
 import simplePrimitives.GameUtils;
-import simplePrimitives.GameUtils.SoundType;
 /**
  * Klasse f�r Herzen
  * @author Nicolas
@@ -32,12 +31,10 @@ public class Heart {
 	public int vbonlcId;
 	public int textureID;
 
-	// slope variables for ball curve
-	private Vec3 slope;
+
 
 	private int indicesCount;
 	private String tex="";
-	private int verticesCount;
 	private boolean visible = true;
 	/**
 	 * Schl�ger erstellen
@@ -77,7 +74,6 @@ public class Heart {
 		FloatBuffer verticesBuffer = BufferUtils.createFloatBuffer(verts.length);
 		verticesBuffer.put(verts);
 		verticesBuffer.flip();
-		verticesCount = verts.length/3;
 		
 		//Farben
 		float[] colors = {

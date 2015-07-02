@@ -1,6 +1,6 @@
 package simplePrimitives;
 
-import java.io.IOException;
+
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
@@ -13,12 +13,7 @@ import org.lwjgl.opengl.GL30;
 
 import mat.Vec3;
 import simplePrimitives.GameUtils;
-import simplePrimitives.GameUtils.SoundType;
 
-import org.newdawn.slick.Color;
-import org.newdawn.slick.opengl.Texture;
-import org.newdawn.slick.opengl.TextureLoader;
-import org.newdawn.slick.util.ResourceLoader;
 /**
  * Klasse für die Schläger
  * @author Nicolas
@@ -43,7 +38,6 @@ public class Paddle {
 
 	private int indicesCount;
 	private String tex="";
-	private int verticesCount;
 	/**
 	 * Schl�ger erstellen
 	 * @param pos ZENTRUM des Schl�gers
@@ -115,7 +109,6 @@ public class Paddle {
 		FloatBuffer verticesBuffer = BufferUtils.createFloatBuffer(verts.length);
 		verticesBuffer.put(verts);
 		verticesBuffer.flip();
-		verticesCount = verts.length/3;
 		
 		//Farben
 		float[] colors = {

@@ -21,24 +21,18 @@ import org.lwjgl.Sys;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.*;
 
+import simplePrimitives.GameUtils.GameState;
 import simplePrimitives.GameUtils.Sides;
 import simplePrimitives.GameUtils.SoundType;
-import de.matthiasmann.twl.utils.PNGDecoder;
-import de.matthiasmann.twl.utils.PNGDecoder.Format;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.DoubleBuffer;
 import java.nio.FloatBuffer;
-import java.nio.IntBuffer;
 
-import kuusisto.tinysound.Music;
-import kuusisto.tinysound.Sound;
 import kuusisto.tinysound.TinySound;
 import static org.lwjgl.glfw.Callbacks.*;
 import static org.lwjgl.glfw.GLFW.*;
@@ -477,7 +471,7 @@ public class Game {
     	if (GameUtils.state == GameUtils.GameState.PointPC){
     		GameUtils.setLives(GameUtils.getLives()-1); //Loose 1 live
     		point = 1;
-    		GameUtils.state = GameUtils.state.AfterPoint;
+    		GameUtils.state = GameState.AfterPoint;
     	}
     	if (GameUtils.state == GameUtils.GameState.PointPlayer){
     		GameUtils.setLevel(GameUtils.getLevel()+1); // Level up!
@@ -485,11 +479,11 @@ public class Game {
     		ball.setPos(new Vec3(0, 0, 1-Ball.r-0.005d));
     		ball.setSpin(new Vec3(0,0,0));
     		point = 0;
-    		GameUtils.state = GameUtils.state.AfterPoint;
+    		GameUtils.state = GameState.AfterPoint;
     	}
 		if (GameUtils.getLives()<1){ //Gameover
 			GameUtils.isLost = true;
-			GameUtils.state = GameUtils.state.BeforeStart;
+			GameUtils.state = GameState.BeforeStart;
 		}
     }
     
@@ -563,14 +557,13 @@ public class Game {
             	if (!aiOnly)
 	        	paddleFront.setPos(worldX, worldY);		//Eigener Schläger
 	            
-	        	if ((GameUtils.state == GameUtils.state.Running)){
+	        	if ((GameUtils.state == GameState.Running)){
 	        		if (aiOnly)
 	        			paddleFront.AI_Act(ball);
 	            	paddleBack.AI_Act(ball);
 	            	ball.update(paddleFront, paddleBack);	//kugel
 	            } else {
 	            	// spawn ball at player paddle without spin
-	            	double tz = paddleFront.getPos().z;
 	            	double z = 1 - (Ball.r+0.005d);
 	            	ball.setPos(new Vec3(worldX, worldY, z));
 	            	ball.setSpin(new Vec3(0,0,0));
@@ -629,12 +622,12 @@ public class Game {
             paddleFront.draw(pId);
             GameUtils.drawHearts(pId);
             GameUtils.drawLevel(pId);
-            if (GameUtils.state == GameUtils.state.AfterPoint) {
+            if (GameUtils.state == GameState.AfterPoint) {
             	Point.draw(pId);
             	if (point == 0) Player1.draw(pId);
             	if (point == 1) Player2.draw(pId);
             }
-            if (GameUtils.getLives()<1 && GameUtils.state == GameUtils.state.BeforeStart) {
+            if (GameUtils.getLives()<1 && GameUtils.state == GameState.BeforeStart) {
             	GameOver.draw(pId);
             }
             //===============ENDE=========================
