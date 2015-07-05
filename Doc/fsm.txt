@@ -1,0 +1,10 @@
+digraph g{
+  BeforeStart -> Running [label="Spiel starten"]
+  Running -> Paused [label=Pause]
+  Paused -> Running 
+  Running -> PointPC [label="PC punktet"]
+  PointPC-> AfterPoint 
+  AfterPoint -> Running [label="Spiel fortsetzen"]
+  Running -> PointPlayer [label="Spieler punktet"]
+  PointPlayer -> AfterPoint 
+}
