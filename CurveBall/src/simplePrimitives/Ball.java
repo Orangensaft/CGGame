@@ -126,9 +126,6 @@ public class Ball {
 		if(Math.abs(pos.z) > Math.abs(GameUtils.far)){
 			//GameUtils.sndPoint.play();
 			GameUtils.requestSound(SoundType.Point);
-			//TODO:
-			//Spiel zur�ck setzen
-			//Eventuell Bot st�rker machen
 		}
 		
 	}
