@@ -10,7 +10,10 @@ import org.lwjgl.opengl.GL15;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 
+import mat.Matrix4;
+import mat.RotationMatrix;
 import mat.Vec3;
+import mat.Vec4;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
@@ -67,12 +70,12 @@ public class Ball {
 	 * NÃ¤chste Position des Balls berechnen
 	 */
 	public void update(Paddle a, Paddle b){
-		if (pos.z > 1){ //Kugel bei Spieler im Aus
+		if (pos.z > 1+r){ //Kugel bei Spieler im Aus
 			//Spiellogik ein Game.java ausgelagert
 			//GameUtils.setLives(GameUtils.getLives()-1);
 			GameUtils.state = GameUtils.GameState.PointPC;
 		}
-		if (pos.z < -1){//Kugel bei Gegner im Aus
+		if (pos.z < -1-r){//Kugel bei Gegner im Aus
 			GameUtils.state = GameUtils.GameState.PointPlayer;
 		}
 		pos.x += direction.x;
@@ -87,7 +90,7 @@ public class Ball {
 			pos.y += spin.y;
 			spin.y -= Math.signum(spin.y)*spinStep.y;
 		}
-		pos.z += direction.z;
+		pos = pos.add(direction);
 		updateDirections(a,b);
 	}
 	
@@ -117,14 +120,10 @@ public class Ball {
 		if (hitsPaddles(a,b)){
 			System.out.println("collided with paddle");
 			GameUtils.requestSound(SoundType.PaddleCol);
-			//GameUtils.sndHit.play();
-			direction.z = -direction.z;
-
 		}
 		
 		//Testen ob Ball Spielfeld verlï¿½sst
-		if(Math.abs(pos.z) > Math.abs(GameUtils.far)){
-			//GameUtils.sndPoint.play();
+		if(Math.abs(pos.z + r) > Math.abs(GameUtils.far)){
 			GameUtils.requestSound(SoundType.Point);
 		}
 		
@@ -178,6 +177,48 @@ public class Ball {
 					// calculate new position
 					double dst = posA.z - pos.z;
 					pos.z = posA.z - Math.signum(dst)*(r+0.05);
+					direction.z = -direction.z;
+					return true;
+				}
+			}
+		}
+		// äußerer Bereich
+		// passt x
+		if (pos.x >= posA.x-r-sizeA[0]/2f && pos.x<=posA.x+r+sizeA[0]/2f){
+			//passt y?
+			if(pos.y >= posA.y-r-sizeA[1]/2f && pos.y<=posA.y+r+sizeA[1]/2f){
+				//passt z -> Liegt SchlÃ¤ger im Radius der Kugel 
+				if(posA.z >= pos.z - r/2f && posA.z<=pos.z + r/2f){
+					// Bestimme im welchem Außenbereich der Ball liegt 
+					int x_rot = 0;
+					int y_rot = 0;
+					if (pos.x < posA.x-sizeA[0]/2f){
+						y_rot = 1;
+					} else if (pos.x > posA.x+sizeA[0]/2f) {
+						y_rot = -1;
+					}
+					if (pos.y < posA.y-sizeA[1]/2f){
+						x_rot = 1;
+					} else if (pos.y > posA.y+sizeA[1]/2f) {
+						x_rot = -1;
+					}
+					System.out.printf("\nHit outer area: (y_r: %d, x_r: %d)\n", y_rot, x_rot);
+					Matrix4 rotMatrix = (Matrix4) new RotationMatrix(45* y_rot, mat.Axis.Y);
+					rotMatrix = (Matrix4) new RotationMatrix(45* x_rot, mat.Axis.X).mul(rotMatrix);
+					// setze spin zu slope
+					Vec3 tmp = a.getSlope();
+					spin.x += tmp.x*.05;
+					spin.y += tmp.y*.05;
+					spinStep.x = Math.abs(spin.x/100d);
+					spinStep.y = Math.abs(spin.y/100d);
+					// calculate new position
+					double dst = posA.z - pos.z;
+					pos.z = posA.z - Math.signum(dst)*(r+0.05);
+					Vec4 tmpD = new Vec4(direction.x, direction.y, direction.z, 1d);
+					tmpD = rotMatrix.mul(tmpD);
+					direction.x = tmpD.x;
+					direction.y = tmpD.y;
+					direction.z = -tmpD.z;
 					
 					return true;
 				}
