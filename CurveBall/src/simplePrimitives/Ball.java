@@ -243,10 +243,10 @@ public class Ball {
 		int vp = 0; // vertex index
 		int tp = 0; // texture pointer
 		
-		double slice_iteration = 1d / (y);
-		double stack_iteration = 1d / (x);
+		double slice_iteration = 1d / (y-1);
+		double stack_iteration = 1d / (x-1);
 		
-		double hangle = 2*Math.PI / (y); // horizonzal angle
+		double hangle = 2*Math.PI / (y-1); // horizontal angle
 		double vangle = Math.PI / (x-1); // vertical angle
 		double hc,vc; // prepare vars for angle calculation
 		for ( int stack=0; stack < x; stack++) {

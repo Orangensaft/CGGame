@@ -193,7 +193,7 @@ public class Game {
             	//Spiel starten, falls möglich
             	if (key == GLFW_KEY_ENTER && action == GLFW_PRESS){
             		if(GameUtils.state == GameUtils.GameState.BeforeStart){
-            			initGame();
+            			resetGame();
             			GameUtils.state = GameUtils.GameState.Running;
             			startGame();
             		}
@@ -315,9 +315,6 @@ public class Game {
 		GameUtils.lvlGui[i] = new Skull(hPos);
 		hPos.x -=0.125;
 	}
-	
-	 
-	
 	
 	// Initialize Sound Board
 	String[] sounds = {"paddle1.wav", "paddle2.wav", "paddle3.wav", "paddle4.wav", "paddle5.wav", 
@@ -460,10 +457,13 @@ public class Game {
     	Point = new Planar( new Vec3(0.3, 0, 1), new Vec3(1,1,0), "assets/point.png");
     	Player1 = new Planar( new Vec3(-0.3, 0, 1), new Vec3(1,1,0), "assets/player1.png");
     	Player2 = new Planar( new Vec3(-0.3, 0, 1), new Vec3(1,1,0), "assets/player2.png");
+    	resetGame();
+    }
+    
+    private void resetGame(){
     	GameUtils.setLevel(1);
     	GameUtils.setLives(3);
     }
-    
     /**
      * Überprüft aktuelle Spielsituation und reagiert dementsprechent
      */
@@ -490,14 +490,24 @@ public class Game {
     private void startGame(){
     	System.out.println("StartGame!");
     	ball.setDirection(new Vec3(0,0,-1d/GameUtils.fps) );
-    	//Ball "Abschießen"
-    	//--> Startdirection auf Kugel tun
     }
     
     
     private void loop() throws Exception {
     	
     	initGame();
+    	
+        //matrix inits etc.
+        modelMatrix = new TranslationMatrix(new Vec3(0,0,1));  // translate...
+        modelMatrix = (Matrix4) new RotationMatrix(modelAngle.y, mat.Axis.Y).mul(modelMatrix); // ... and rotate, multiply matrices 
+        GL20.glUseProgram(pId);
+        GL20.glUniformMatrix4fv(projectionMatrixLocation, false , toFFB(projectionMatrix));
+        GL20.glUniformMatrix4fv(viewMatrixLocation, false, toFFB(viewMatrix));
+        GL20.glUniformMatrix4fv(modelMatrixLocation, false, toFFB(modelMatrix));
+        GL20.glUniform1i(useNormalColoringLocation, useNormalColoring);
+        GL20.glUniform1i(useTextureLocation, useTexture);
+    
+        GL20.glUseProgram(0);
         
     	double lastLoopTime = getTime();
     	float delta;
@@ -516,18 +526,7 @@ public class Game {
         		timeCount -=1f;
         		System.out.println(GameUtils.fps+" State? "+GameUtils.state);
         	}
-        	
-            //matrix inits etc.
-            modelMatrix = new TranslationMatrix(new Vec3(0,0,1));  // translate...
-            modelMatrix = (Matrix4) new RotationMatrix(modelAngle.y, mat.Axis.Y).mul(modelMatrix); // ... and rotate, multiply matrices 
-            GL20.glUseProgram(pId);
-            GL20.glUniformMatrix4fv(projectionMatrixLocation, false , toFFB(projectionMatrix));
-            GL20.glUniformMatrix4fv(viewMatrixLocation, false, toFFB(viewMatrix));
-            GL20.glUniformMatrix4fv(modelMatrixLocation, false, toFFB(modelMatrix));
-            GL20.glUniform1i(useNormalColoringLocation, useNormalColoring);
-            GL20.glUniform1i(useTextureLocation, useTexture);
-        
-            GL20.glUseProgram(0);
+
 
             //Mausposition abgreifen
             DoubleBuffer x = BufferUtils.createDoubleBuffer(1);
@@ -578,10 +577,6 @@ public class Game {
 	            wallRight.update(ball, GameUtils.state);
 	            wallBot.update(ball, GameUtils.state);
         	
-            }
-            
-            if (GameUtils.isLost) {
-            //	GameOver.draw(pID);
             }
             // ================================== Draw objects =================================
             /*Hier die Objekte von hinten nach vorne zeichen
