@@ -1,7 +1,8 @@
 /**
-  * A simple application for displaying a rectangle with drawElements and triangle strip
+  * A simple curveball clone
   * 
-  * @author Thorsten Gattinger
+  * @author Jan F
+  * @author Nicolas M
   * 
   * sources:
   * http://wiki.lwjgl.org/wiki/The_Quad_with_DrawElements and the other Quad-parts
@@ -650,6 +651,7 @@ public class Game {
 	}
 	
     public static void main(String[] args) {
+    	System.setProperty("org.lwjgl.librarypath", new File("natives").getAbsolutePath());
         new Game().run();
     }
  

@@ -170,8 +170,13 @@ public class Ball {
 				if(posA.z >= pos.z - r && posA.z<=pos.z + r){
 					// setze spin zu slope
 					Vec3 tmp = a.getSlope();
-					spin.x += tmp.x*.05;
-					spin.y += tmp.y*.05;
+					spin.x += tmp.x*.1;
+					spin.y += tmp.y*.1;
+					double spin_moment = Math.sqrt(Math.pow(spin.x,2) + Math.pow(spin.y,2));
+					// Limit Spin to game speed
+					if (spin_moment > GameUtils.gspeed) {
+						spin = spin.mulElemwise(GameUtils.gspeed/spin_moment);
+					}
 					spinStep.x = Math.abs(spin.x/100d);
 					spinStep.y = Math.abs(spin.y/100d);
 					// calculate new position
@@ -182,14 +187,14 @@ public class Ball {
 				}
 			}
 		}
-		// äußerer Bereich
+		// ï¿½uï¿½erer Bereich
 		// passt x
 		if (pos.x >= posA.x-r-sizeA[0]/2f && pos.x<=posA.x+r+sizeA[0]/2f){
 			//passt y?
 			if(pos.y >= posA.y-r-sizeA[1]/2f && pos.y<=posA.y+r+sizeA[1]/2f){
 				//passt z -> Liegt SchlÃ¤ger im Radius der Kugel 
 				if(posA.z >= pos.z - r/2f && posA.z<=pos.z + r/2f){
-					// Bestimme im welchem Außenbereich der Ball liegt 
+					// Bestimme im welchem Auï¿½enbereich der Ball liegt 
 					int x_rot = 0;
 					int y_rot = 0;
 					if (pos.x < posA.x-sizeA[0]/2f){
@@ -207,15 +212,26 @@ public class Ball {
 					rotMatrix = (Matrix4) new RotationMatrix(45* x_rot, mat.Axis.X).mul(rotMatrix);
 					// setze spin zu slope
 					Vec3 tmp = a.getSlope();
-					spin.x += tmp.x*.05;
-					spin.y += tmp.y*.05;
+					spin.x += tmp.x*.1;
+					spin.y += tmp.y*.1;
+					double spin_moment = Math.sqrt(Math.pow(spin.x,2) + Math.pow(spin.y,2));
+					// Limit Spin to game speed
+					if (spin_moment > GameUtils.gspeed) {
+						spin = spin.mulElemwise(GameUtils.gspeed/spin_moment);
+					}
+					
 					spinStep.x = Math.abs(spin.x/100d);
 					spinStep.y = Math.abs(spin.y/100d);
+					
 					// calculate new position
 					double dst = posA.z - pos.z;
 					pos.z = posA.z - Math.signum(dst)*(r+0.05);
+					
 					Vec4 tmpD = new Vec4(direction.x, direction.y, direction.z, 1d);
 					tmpD = rotMatrix.mul(tmpD);
+					if (Math.abs(tmpD.z) < 0.1/GameUtils.fps) {
+						tmpD.z = Math.signum(direction.z)*0.3/GameUtils.fps;
+					}
 					direction.x = tmpD.x;
 					direction.y = tmpD.y;
 					direction.z = -tmpD.z;

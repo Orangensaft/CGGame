@@ -75,7 +75,7 @@ public abstract class GameUtils {
 	public static AudioThread Playing;
 	public static boolean active;
 	public static Random rand = new Random();
-	
+	public static double gspeed;
 	//TinySound, Soundfiles
 	public static BGMusicThread bg;
 	
@@ -87,7 +87,13 @@ public abstract class GameUtils {
 	
 	public static void adjustSpeed (Ball ball) {
 		Vec3 dirs = ball.getDirs();
-		dirs.z = Math.signum(dirs.z)*Math.pow(1.1, lvl-1)/fps;
+		if (lvl < 5){
+			gspeed = Math.pow(1.075d, lvl-1)/fps;
+		} else {
+			gspeed = 1.25d/fps;
+		}
+		double cspeed = Math.sqrt(Math.pow(dirs.x, 2) + Math.pow(dirs.y, 2) + Math.pow(dirs.z, 2)); 
+		dirs = dirs.mulElemwise(gspeed/cspeed);
 		ball.setDirs(dirs);
 	}
 	
